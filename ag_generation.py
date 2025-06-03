@@ -19,7 +19,10 @@ def _translate(label, root=False):
     if len(parts) >= 1:
         new_label += verbose_micro[parts[0]]
     if len(parts) >= 2:
-        new_label += "\n" + parts[1]
+        if parts[1] in ['modbus', 'http', 'https', 'ssh', 'telnet', 'ftp', 'smtp']:
+            new_label += "\n" + parts[1].upper()
+        else:
+            new_label += "\n" + parts[1]
     if len(parts) >= 3:
         new_label += " | ID: " + parts[2]
 
