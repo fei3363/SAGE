@@ -15,7 +15,13 @@ from model_learning import generate_traces, flexfringe, load_model, encode_seque
 from plotting import plot_alert_filtering, plot_histogram, plot_state_groups
 from signatures.attack_stages import MicroAttackStage
 from signatures.mappings import micro_inv
-from signatures.alert_signatures import usual_mapping, unknown_mapping, ccdc_combined, attack_stage_mapping
+from signatures.alert_signatures import (
+    usual_mapping,
+    unknown_mapping,
+    ccdc_combined,
+    attack_stage_mapping,
+    zeek_mapping,
+)
 
 
 IANA_CSV_FILE = "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.csv"
@@ -32,17 +38,29 @@ def _get_attack_stage_mapping(signature):
     @return: the inferred attack stage
     """
     result = MicroAttackStage.NON_MALICIOUS
-    if signature in usual_mapping.keys():
+
+    # Exact matches first
+    if signature in usual_mapping:
         result = usual_mapping[signature]
-    elif signature in unknown_mapping.keys():
+    elif signature in unknown_mapping:
         result = unknown_mapping[signature]
-    elif signature in ccdc_combined.keys():
+    elif signature in ccdc_combined:
         result = ccdc_combined[signature]
+    elif signature in zeek_mapping:
+        result = zeek_mapping[signature]
     else:
-        for k, v in attack_stage_mapping.items():
-            if signature in v:
-                result = k
+        # Partial matches for zeek signatures that contain parameters
+        for sig, stage in zeek_mapping.items():
+            if sig in signature:
+                result = stage
                 break
+
+        if result == MicroAttackStage.NON_MALICIOUS:
+            for k, v in attack_stage_mapping.items():
+                if signature in v:
+                    result = k
+                    break
+
     return micro_inv[str(result)]
 
 
@@ -122,27 +140,38 @@ def _parse(unparsed_data):
         else:
             raw = d
 
-        if raw['event_type'] != 'alert':
+        is_zeek = 'zeek_original' in raw or raw.get('host') == 'zeek' or d.get('host') == 'zeek'
+
+        if not is_zeek and raw.get('event_type') != 'alert':
             continue
 
-        if 'host' in raw:
-            host = raw['host']
-        elif 'host' in d:
-            host = d['host'][3:]
-        else:
-            host = 'dummy'
+        host = 'zeek' if is_zeek else (
+            raw['host'] if 'host' in raw else (d['host'][3:] if 'host' in d else 'dummy')
+        )
 
-        dt = datetime.datetime.strptime(raw['timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z')  # 2018-11-03T23:16:09.148520+0000
+        ts = d.get('timestamp', raw.get('timestamp'))
+        try:
+            dt = datetime.datetime.strptime(ts, '%Y-%m-%dT%H:%M:%S.%f%z')
+        except ValueError:
+            dt = datetime.datetime.strptime(ts, '%Y-%m-%dT%H:%M:%S%z')
+
         diff_dt = 0.0 if prev == -1 else round((dt - prev).total_seconds(), 2)
         prev = dt
 
-        sig = raw['alert']['signature']
-        cat = raw['alert']['category']
-
-        src_ip = raw['src_ip']
-        src_port = None if 'src_port' not in raw.keys() else raw['src_port']
-        dst_ip = raw['dest_ip']
-        dst_port = None if 'dest_port' not in raw.keys() else raw['dest_port']
+        if is_zeek:
+            sig = raw.get('alert', {}).get('signature', 'Unknown')
+            cat = raw.get('alert', {}).get('category', 'Zeek')
+            src_ip = d.get('src_ip') or raw.get('src_ip')
+            src_port = d.get('src_port') or raw.get('src_port')
+            dst_ip = d.get('dest_ip') or raw.get('dest_ip')
+            dst_port = d.get('dest_port') or raw.get('dest_port')
+        else:
+            sig = raw['alert']['signature']
+            cat = raw['alert']['category']
+            src_ip = raw['src_ip']
+            src_port = None if 'src_port' not in raw else raw['src_port']
+            dst_ip = raw['dest_ip']
+            dst_port = None if 'dest_port' not in raw else raw['dest_port']
 
         # Filter out mistaken alerts / uninteresting alerts
         if (dataset_name == 'cptc' and CPTC_BAD_IP in (src_ip, dst_ip)) or cat == 'Not Suspicious Traffic':
@@ -167,14 +196,19 @@ def _remove_duplicates(unfiltered_alerts, plot=False, gap=1.0):
     @param gap: the filtering gap, i.e. alert filtering window (parameter `t` in the paper, default 1.0 sec)
     @return: the alerts without duplicates
     """
-    filtered_alerts = [unfiltered_alerts[x] for x in range(1, len(unfiltered_alerts))
-                       if unfiltered_alerts[x][9] != MicroAttackStage.NON_MALICIOUS.value  # Skip non-malicious alerts
-                       and not (unfiltered_alerts[x][0] <= gap  # Diff from previous alert is less than gap sec
-                                and unfiltered_alerts[x][1] == unfiltered_alerts[x - 1][1]  # Same srcIP
-                                and unfiltered_alerts[x][3] == unfiltered_alerts[x - 1][3]  # Same destIP
-                                and unfiltered_alerts[x][5] == unfiltered_alerts[x - 1][5]  # Same suricata category
-                                and unfiltered_alerts[x][2] == unfiltered_alerts[x - 1][2]  # Same srcPort
-                                and unfiltered_alerts[x][4] == unfiltered_alerts[x - 1][4])]  # Same destPort
+    filtered_alerts = []
+    prev_alerts = {}
+    for alert in unfiltered_alerts:
+        if alert[9] == MicroAttackStage.NON_MALICIOUS:
+            continue
+
+        key = (alert[1], alert[3], alert[5])
+        if key in prev_alerts:
+            prev = prev_alerts[key]
+            if (alert[8] - prev[8]).total_seconds() <= gap:
+                continue
+        prev_alerts[key] = alert
+        filtered_alerts.append(alert)
     if plot:
         plot_alert_filtering(unfiltered_alerts, filtered_alerts)
 
@@ -241,11 +275,31 @@ def group_alerts_per_team(alerts, port_mapping):
             src_ip, dst_ip, signature, ts, mcat = alert[1], alert[3], alert[5], alert[8], alert[9]
             dst_port = alert[4] if alert[4] is not None else 65000
 
-            # Say 'unknown' if the port cannot be resolved
-            if dst_port not in port_mapping.keys() or port_mapping[dst_port] == 'unknown':
-                dst_port = 'unknown'
+            is_zeek_format = (
+                'zeek' in alert[7].lower()
+                or 'OT_' in signature
+                or 'Modbus' in signature
+                or 'HTTP' in signature
+            )
+
+            if is_zeek_format:
+                if isinstance(dst_port, str) and dst_port != 'unknown':
+                    dst_port_service = dst_port
+                elif dst_port == 502:
+                    dst_port_service = 'modbus'
+                elif dst_port == 80:
+                    dst_port_service = 'http'
+                elif dst_port == 443:
+                    dst_port_service = 'https'
+                elif dst_port in port_mapping:
+                    dst_port_service = port_mapping[dst_port]['name']
+                else:
+                    dst_port_service = 'unknown'
             else:
-                dst_port = port_mapping[dst_port]['name']
+                if dst_port not in port_mapping or port_mapping[dst_port] == 'unknown':
+                    dst_port_service = 'unknown'
+                else:
+                    dst_port_service = port_mapping[dst_port]['name']
 
             # For the CPTC dataset, attacker IPs (src_ip) start with '10.0.254', but this prefix might also be in dst_ip
             # TODO: for the future, we might want to address internal paths
@@ -259,9 +313,9 @@ def group_alerts_per_team(alerts, port_mapping):
                 host_alerts[(src_ip, dst_ip)] = []
 
             if (src_ip, dst_ip) in host_alerts.keys():  # TODO: remove the redundant host names
-                host_alerts[(src_ip, dst_ip)].append((dst_ip, mcat, ts, dst_port, signature))
+                host_alerts[(src_ip, dst_ip)].append((dst_ip, mcat, ts, dst_port_service, signature))
             else:
-                host_alerts[(dst_ip, src_ip)].append((src_ip, mcat, ts, dst_port, signature))
+                host_alerts[(dst_ip, src_ip)].append((src_ip, mcat, ts, dst_port_service, signature))
 
         _team_data[tid] = host_alerts.items()
     return _team_data
@@ -274,8 +328,9 @@ parser.add_argument('experiment_name', type=str, help='Custom name for all artef
 parser.add_argument('-t', type=float, required=False, default=1.0, help='Time window in which duplicate alerts are discarded (default: 1.0 sec)')
 parser.add_argument('-w', type=int, required=False, default=150, help='Aggregate alerts occuring in this window as one episode (default: 150 sec)')
 parser.add_argument('--timerange', type=int, nargs=2, required=False, default=[0, 100], metavar=('STARTRANGE', 'ENDRANGE'), help='Filtering alerts. Only parsing from and to the specified hours, relative to the start of the alert capture (default: (0, 100))')
-parser.add_argument('--dataset', required=False, type=str, choices=['cptc', 'other'], default='other', help='The name of the dataset with the alerts (default: other)')
+parser.add_argument('--dataset', required=False, type=str, choices=['cptc', 'other', 'zeek'], default='other', help='The name of the dataset with the alerts (default: other)')
 parser.add_argument('--keep-files', action='store_true', help='Do not delete the dot files after the program ends')
+parser.add_argument('--zeek-format', action='store_true', help='Input alerts are produced from Zeek logs')
 args = parser.parse_args()
 
 path_to_json_files = args.path_to_json_files
@@ -285,6 +340,7 @@ alert_aggr_window = args.w
 start_hour, end_hour = args.timerange
 dataset_name = args.dataset
 delete_files = not args.keep_files
+is_zeek_input = args.zeek_format or dataset_name == 'zeek'
 
 path_to_ini = "FlexFringe/ini/spdfa-config.ini"
 
@@ -294,6 +350,8 @@ ag_directory = experiment_name + 'AGs'
 print('------ Downloading the IANA port-service mapping ------')
 port_services = load_iana_mapping()
 
+if is_zeek_input:
+    print('------ 處理 Zeek 格式的警報 ------')
 print('------ Reading alerts ------')
 team_alerts, team_labels, team_start_times = load_data(path_to_json_files, alert_filtering_window, start_hour, end_hour)
 plot_histogram(team_alerts, team_labels, experiment_name)

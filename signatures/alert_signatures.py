@@ -992,6 +992,33 @@ recent_suricata_alerts = {
     "ETPRO TROJAN TDrop CnC Checkin": MicroAttackStage.COMMAND_AND_CONTROL,
 }
 
+# Mapping for Zeek specific alerts produced by the zeek_to_sage converter
+zeek_mapping = {
+    # OT related
+    "OT_Scan_NonStandard_Port": MicroAttackStage.SERVICE_DISC,
+    "OT_Modbus_Write": MicroAttackStage.DATA_MANIPULATION,
+    "OT_HTTP_Suspicious_URI": MicroAttackStage.PUBLIC_APP_EXP,
+
+    # Modbus
+    "Modbus Write Single Coil": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus Write Single Register": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus Write Multiple Coils": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus Write Multiple Registers": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus Read Coils": MicroAttackStage.INFO_DISC,
+    "Modbus Read Discrete Inputs": MicroAttackStage.INFO_DISC,
+    "Modbus Read Holding Registers": MicroAttackStage.INFO_DISC,
+    "Modbus Read Input Registers": MicroAttackStage.INFO_DISC,
+
+    # HTTP
+    "HTTP Suspicious URI": MicroAttackStage.PUBLIC_APP_EXP,
+    "HTTP POST Request": MicroAttackStage.DATA_DELIVERY,
+
+    # Generic connection alerts
+    "Scan": MicroAttackStage.SERVICE_DISC,
+    "Brute_Force": MicroAttackStage.BRUTE_FORCE_CREDS,
+    "Failed_Auth": MicroAttackStage.BRUTE_FORCE_CREDS,
+}
+
 attack_stage_mapping = {
     MicroAttackStage.END_POINT_DOS: endpointDoS_signatures,
     MicroAttackStage.NETWORK_DOS: networkDoS_signatures,

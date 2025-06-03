@@ -17,15 +17,21 @@ def _most_frequent(serv):
     max_frequency = 0
     most_frequent_service = None
     count_unknown = 0
+
+    special_services = ['modbus', 'http', 'https', 'ssh', 'telnet', 'ftp', 'smtp']
+    for special_service in special_services:
+        if special_service in serv:
+            return special_service
+
     for s in serv:
-        frequency = serv.count(s)
-        # Count the frequency of 'unknown' to break a tie against it
         if s == 'unknown':
-            count_unknown = frequency
+            count_unknown = serv.count(s)
             continue
+        frequency = serv.count(s)
         if frequency > max_frequency:
             most_frequent_service = s
             max_frequency = frequency
+
     return most_frequent_service if max_frequency >= count_unknown else 'unknown'
 
 
