@@ -247,7 +247,7 @@ def break_into_subbehaviors(host_data, full_seq=False):
     for i, (attacker, victim_episodes) in enumerate(host_data.items()):
         print((i + 1), sep=' ', end=' ', flush=True)
         for episodes in victim_episodes:
-            if len(episodes) < 2:
+            if len(episodes) == 0:
                 continue
 
             victim = episodes[0][-1]

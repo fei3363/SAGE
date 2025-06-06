@@ -38,6 +38,7 @@ def _get_attack_stage_mapping(signature):
     @return: the inferred attack stage
     """
     result = MicroAttackStage.NON_MALICIOUS
+    
 
     # Exact matches first
     if signature in usual_mapping:
@@ -159,8 +160,9 @@ def _parse(unparsed_data):
         prev = dt
 
         if is_zeek:
-            sig = raw.get('alert', {}).get('signature', 'Unknown')
-            cat = raw.get('alert', {}).get('category', 'Zeek')
+            sig = d.get('alert', {}).get('signature', raw.get('alert', {}).get('signature', 'Unknown'))
+            cat = d.get('alert', {}).get('category', raw.get('alert', {}).get('category', 'Zeek'))
+            
             src_ip = d.get('src_ip') or raw.get('src_ip')
             src_port = d.get('src_port') or raw.get('src_port')
             dst_ip = d.get('dest_ip') or raw.get('dest_ip')

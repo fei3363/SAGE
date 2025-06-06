@@ -49,7 +49,7 @@ def generate_traces(subsequences, datafile):
 
     flexfringe_traces = []
     for i, episodes in enumerate(subsequences.values()):
-        if len(episodes) < 3:  # Discard subsequences of length < 3 (can be commented out, also in make_state_sequences)
+        if len(episodes) == 0 :  # Discard subsequences of length < 3 (can be commented out, also in make_state_sequences)
             continue
         num_traces += 1
         mcats = [x[2] for x in episodes]
@@ -172,7 +172,7 @@ def encode_sequences(dfa, sinks, subsequences):
     state_sequences = dict()
     med_sev_states, high_sev_states, sev_sinks = set(), set(), set()
     for i, (attacker, episodes) in enumerate(subsequences.items()):
-        if len(episodes) < 3:  # Discard subsequences of length < 3 (can be commented out, also in make_state_sequences)
+        if len(episodes) == 0 :  # Discard subsequences of length < 3 (can be commented out, also in make_state_sequences)
             continue
         
         mcats = [x[2] for x in episodes]

@@ -10,10 +10,10 @@ EXP_NAME="$2"
 shift 2
 SAGE_OPTIONS="$@"
 
-python zeek_to_sage.py "$ZEEK_DIR" "${EXP_NAME}_alerts.json"
+python3 zeek_to_sage.py "$ZEEK_DIR" "${EXP_NAME}_alerts.json"
 ALERT_DIR="${EXP_NAME}_alerts"
 mkdir -p "$ALERT_DIR"
 mv "${EXP_NAME}_alerts.json" "$ALERT_DIR/"
-python sage.py "$ALERT_DIR" "$EXP_NAME" --dataset zeek --keep-files $SAGE_OPTIONS
+python3 sage.py "$ALERT_DIR" "$EXP_NAME" --dataset zeek --keep-files $SAGE_OPTIONS
 
 echo "Done. Attack graphs in ${EXP_NAME}AGs/"

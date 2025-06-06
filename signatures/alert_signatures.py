@@ -994,6 +994,34 @@ recent_suricata_alerts = {
 
 # Mapping for Zeek specific alerts produced by the zeek_to_sage converter
 zeek_mapping = {
+
+    "Modbus READ_COILS": MicroAttackStage.INFO_DISC,
+    "Modbus READ_COILS_EXCEPTION": MicroAttackStage.INFO_DISC,
+    "Modbus READ_DISCRETE_INPUTS": MicroAttackStage.INFO_DISC,
+    "Modbus READ_DISCRETE_INPUTS_EXCEPTION": MicroAttackStage.INFO_DISC,
+    "Modbus READ_HOLDING_REGISTERS": MicroAttackStage.INFO_DISC,
+    "Modbus READ_HOLDING_REGISTERS_EXCEPTION": MicroAttackStage.INFO_DISC,
+    "Modbus READ_INPUT_REGISTERS": MicroAttackStage.INFO_DISC,
+    "Modbus READ_INPUT_REGISTERS_EXCEPTION": MicroAttackStage.INFO_DISC,
+    "Modbus READ_FILE_RECORD": MicroAttackStage.INFO_DISC,
+    "Modbus READ_FILE_RECORD_EXCEPTION": MicroAttackStage.INFO_DISC,
+
+    "Modbus WRITE_SINGLE_COIL": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus WRITE_SINGLE_COIL_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus WRITE_SINGLE_REGISTER": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus WRITE_SINGLE_REGISTER_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus WRITE_MULTIPLE_COILS": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus WRITE_MULTIPLE_COILS_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus WRITE_MULTIPLE_REGISTERS": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus WRITE_MULTIPLE_REGISTERS_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus WRITE_FILE_RECORD": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus WRITE_FILE_RECORD_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
+
+    "Modbus READ_WRITE_MULTIPLE_REGISTERS": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus READ_WRITE_MULTIPLE_REGISTERS_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus MASK_WRITE_REGISTER": MicroAttackStage.DATA_MANIPULATION,
+    "Modbus MASK_WRITE_REGISTER_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
+
     # OT related
     "OT_Scan_NonStandard_Port": MicroAttackStage.SERVICE_DISC,
     "OT_Modbus_Write": MicroAttackStage.DATA_MANIPULATION,
