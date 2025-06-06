@@ -91,10 +91,36 @@ def process_modbus_log(log_file):
             dst_port = int(dst_port)
         else:
             dst_port = None
+        # Get more detailed Modbus information
         func = record.get('func', 'Unknown')
         is_write = any(w in func.lower() for w in ['write', 'force'])
-        signature = f"Modbus {func}"
+        pdu_type = record.get('pdu_type', '')
+        unit = record.get('unit', '')
+        address = record.get('address', '')
+        quantity = record.get('quantity', '')
+        values = record.get('values', '')
+        exception = record.get('exception', '')
+        tid = record.get('tid', '')
+
+        # Create more detailed signature
+        details = []
+        if unit:
+            details.append(f"Unit:{unit}")
+        if address and address != '-':
+            details.append(f"Addr:{address}")
+        if quantity and quantity != '-':
+            details.append(f"Qty:{quantity}")
+        if values and values != '-':
+            details.append(f"Val:{values}")
+        if tid:
+            details.append(f"TID:{tid}")
+        if exception and exception != '-':
+            details.append(f"Exc:{exception}")
+
+        detail_str = " - " + ", ".join(details) if details else ""
+        signature = f"Modbus {func}{detail_str}"
         category = 'Modbus Write' if is_write else 'Modbus Read'
+
         alert = {
             'event_type': 'alert',
             'timestamp': timestamp,
@@ -108,7 +134,17 @@ def process_modbus_log(log_file):
             'dest_port': dst_port,
             'host': 'zeek',
             'result': {
-                '_raw': json.dumps({'func': func, 'zeek_original': record})
+                '_raw': json.dumps({
+                    'func': func,
+                    'pdu_type': pdu_type,
+                    'unit': unit,
+                    'address': address,
+                    'quantity': quantity,
+                    'values': values,
+                    'exception': exception,
+                    'tid': tid,
+                    'zeek_original': record
+                })
             }
         }
         alerts.append(alert)

@@ -24,6 +24,12 @@ def _translate(label, root=False):
         else:
             new_label += "\n" + parts[1]
     if len(parts) >= 3:
+        # If there are detailed information (e.g. Unit, Address, etc.), extract and display them
+        if " - " in parts[1]:
+            service_parts = parts[1].split(" - ")
+            if len(service_parts) > 1:
+                new_label += "\n" + service_parts[1]
+
         new_label += " | ID: " + parts[2]
 
     return new_label
@@ -79,11 +85,25 @@ def _make_vertex_info(episode, in_main_model):
     cat = micro[episode[2]].split('.')[1]
     signs = episode[5]
     timestamps = episode[6]
-    if episode[3] in in_main_model:  # TODO: this check is useless, since it is always True
+
+    # Extract more details from signatures
+    details = []
+    for sign in signs:
+        if "Modbus" in sign and " - " in sign:
+            parts = sign.split(" - ")
+            if len(parts) > 1:
+                details.append(parts[1])
+
+    # Add details to service name
+    service_detail = episode[4]
+    if details and "modbus" in episode[4].lower():
+        service_detail = episode[4] + " - " + "; ".join(details)
+
+    if episode[3] in in_main_model:
         state_id = '' if len(str(episode[2])) == 1 else '|' + str(episode[3])
     else:
         state_id = '|Sink'
-    vert_name = cat + '|' + episode[4] + state_id
+    vert_name = cat + '|' + service_detail + state_id
     vert_info = (vert_name, start_time, end_time, signs, timestamps)
     return vert_info
 
@@ -161,17 +181,33 @@ def _create_edge_line(vid, vname1, vname2, ts1, ts2, color, attacker):
     @param attacker: the IP of the attacker for which this edge is created
     @return: the line defining the given edge (edge name, i.e. "tail -> head", color, label)
     """
-    from_last = ts1[1].strftime("%d/%m/%y, %H:%M:%S")
-    to_first = ts2[0].strftime("%d/%m/%y, %H:%M:%S")
+    # 將時間格式改為年/月/日
+    from_last = ts1[1].strftime("%Y/%m/%d, %H:%M:%S")  # 修改時間格式
+    to_first = ts2[0].strftime("%Y/%m/%d, %H:%M:%S")    # 修改時間格式
     gap = round((ts2[0] - ts1[1]).total_seconds())
     edge_name = '"{}" -> "{}"'.format(_translate(vname1), _translate(vname2))
+
+    # Extract details from node names
+    details1 = ""
+    details2 = ""
+    if " - " in vname1:
+        parts = vname1.split(" - ")
+        if len(parts) > 1:
+            details1 = "Details: " + parts[1] + "<br/>"
+
+    if " - " in vname2:
+        parts = vname2.split(" - ")
+        if len(parts) > 1:
+            details2 = "Details: " + parts[1] + "<br/>"
+
     if vid == 0:  # First transition, add attacker IP
-        label = '<<font color="{}"> start_next: {}<br/>gap: {}sec<br/>end_prev: {}</font>'
+        label = '<<font color="{}"> start_next: {}<br/>gap: {}sec<br/>end_prev: {}<br/>{}</font>'
         label += '<br/><font color="{}"><b>Attacker: {}</b></font>>'
-        label = label.format(color, to_first, gap, from_last, color, attacker)
+        label = label.format(color, to_first, gap, from_last, details2, color, attacker)
         edge_line = '{} [ color={}] [label={}]'.format(edge_name, color, label)
     else:
-        label = 'start_next: {}\ngap: {}sec\nend_prev: {}'.format(to_first, gap, from_last)
+        label = 'start_next: {}\ngap: {}sec\nend_prev: {}\n{}'
+        label = label.format(to_first, gap, from_last, details2.replace("<br/>", "\n"))
         edge_line = '{} [ label="{}"][ fontcolor="{}" color={}]'.format(edge_name, label, color, color)
     return edge_line
 
