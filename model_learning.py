@@ -34,41 +34,76 @@ def _most_frequent(serv):
 
     return most_frequent_service if max_frequency >= count_unknown else 'unknown'
 
-
-# Step 4.2: Generate traces for FlexFringe (27 Aug 2020)
+# ---------------------------------------------------------------------------
+# Step 4.2: Generate traces for FlexFringe  -- «patched»
+# ---------------------------------------------------------------------------
 def generate_traces(subsequences, datafile):
-    """
-    Generates the episode traces to pass to FlexFringe. An episode trace is a (reversed) sequence of `mcat|mserv`.
+    token2id, id2token = {}, {}
+    next_id = 0
+    traces = []
 
-    @param subsequences: the episode subsequences per attacker-victim pair
-    @param datafile: the file where the traces have to be written to
-    @return: the FlexFringe traces (to be reused in the `encode_sequences` function)
-    """
-    num_traces = 0
-    unique_symbols = set()  # FlexFringe treats the (mcat,mserv) pairs as symbols of the alphabet
-
-    flexfringe_traces = []
-    for i, episodes in enumerate(subsequences.values()):
-        if len(episodes) == 0 :  # Discard subsequences of length < 3 (can be commented out, also in make_state_sequences)
+    for episodes in subsequences.values():
+        if not episodes:
             continue
-        num_traces += 1
-        mcats = [x[2] for x in episodes]
-        num_services = [len(set((x[6]))) for x in episodes]
-        max_services = [_most_frequent(x[6]) for x in episodes]
 
-        # symbols = [str(mcat) + ":" + str(num_serv) + "," + str(mserv) for (mcat, num_serv, mserv) in zip(mcats, num_services, max_services)]  # Multivariate case (TODO: has to be fixed if used)
-        symbols = [small_mapping[mcat] + "|" + mserv for mcat, mserv in zip(mcats, max_services)]
-        unique_symbols.update(symbols)
-        symbols.reverse()  # Reverse traces to accentuate high-severity episodes (to create an S-PDFA)
-        trace = '1' + " " + str(len(mcats)) + ' ' + ' '.join(symbols) + '\n'
-        flexfringe_traces.append(trace)
+        # 事件 token → 整數 ID
+        tokens = [small_mapping[x[2]] + "|" + _most_frequent(x[6]) for x in episodes]
+        ids = []
+        for t in tokens:
+            if t not in token2id:
+                token2id[t] = next_id
+                id2token[next_id] = t
+                next_id += 1
+            ids.append(token2id[t])
 
-    with open(datafile, 'w') as f:
-        f.write(str(num_traces) + ' ' + str(len(unique_symbols)) + '\n')
-        for trace in flexfringe_traces:
-            f.write(trace)
-    print('\n# episode traces:', len(flexfringe_traces))
-    return flexfringe_traces
+        ids.reverse()
+        traces.append(ids)
+
+    # ------- 寫檔，補回 header + 類別標籤 -------
+    with open(datafile, "w") as f:
+        f.write(f"{len(traces)} {len(token2id)}\n")            # ← header
+        for ids in traces:
+            f.write(f"1 {len(ids)} " + " ".join(map(str, ids)) + "\n")   # ← 1 = positive class
+
+    print("# episode traces:", len(traces))
+    return token2id, id2token
+
+
+
+# # Step 4.2: Generate traces for FlexFringe (27 Aug 2020)
+# def generate_traces(subsequences, datafile):
+#     """
+#     Generates the episode traces to pass to FlexFringe. An episode trace is a (reversed) sequence of `mcat|mserv`.
+
+#     @param subsequences: the episode subsequences per attacker-victim pair
+#     @param datafile: the file where the traces have to be written to
+#     @return: the FlexFringe traces (to be reused in the `encode_sequences` function)
+#     """
+#     num_traces = 0
+#     unique_symbols = set()  # FlexFringe treats the (mcat,mserv) pairs as symbols of the alphabet
+
+#     flexfringe_traces = []
+#     for i, episodes in enumerate(subsequences.values()):
+#         if len(episodes) == 0 :  # Discard subsequences of length < 3 (can be commented out, also in make_state_sequences)
+#             continue
+#         num_traces += 1
+#         mcats = [x[2] for x in episodes]
+#         num_services = [len(set((x[6]))) for x in episodes]
+#         max_services = [_most_frequent(x[6]) for x in episodes]
+
+#         # symbols = [str(mcat) + ":" + str(num_serv) + "," + str(mserv) for (mcat, num_serv, mserv) in zip(mcats, num_services, max_services)]  # Multivariate case (TODO: has to be fixed if used)
+#         symbols = [small_mapping[mcat] + "|" + mserv for mcat, mserv in zip(mcats, max_services)]
+#         unique_symbols.update(symbols)
+#         symbols.reverse()  # Reverse traces to accentuate high-severity episodes (to create an S-PDFA)
+#         trace = '1' + " " + str(len(mcats)) + ' ' + ' '.join(symbols) + '\n'
+#         flexfringe_traces.append(trace)
+
+#     with open(datafile, 'w') as f:
+#         f.write(str(num_traces) + ' ' + str(len(unique_symbols)) + '\n')
+#         for trace in flexfringe_traces:
+#             f.write(trace)
+#     print('\n# episode traces:', len(flexfringe_traces))
+#     return flexfringe_traces
 
 
 # Step 5: Learn the model (2 sept 2020)
