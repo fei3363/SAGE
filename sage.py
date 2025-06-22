@@ -333,6 +333,7 @@ parser.add_argument('--timerange', type=int, nargs=2, required=False, default=[0
 parser.add_argument('--dataset', required=False, type=str, choices=['cptc', 'other', 'zeek'], default='other', help='The name of the dataset with the alerts (default: other)')
 parser.add_argument('--keep-files', action='store_true', help='Do not delete the dot files after the program ends')
 parser.add_argument('--zeek-format', action='store_true', help='Input alerts are produced from Zeek logs')
+parser.add_argument('--ics', action='store_true', help='Use ICS ATT&CK mapping for attack graphs')
 args = parser.parse_args()
 
 path_to_json_files = args.path_to_json_files
@@ -343,6 +344,7 @@ start_hour, end_hour = args.timerange
 dataset_name = args.dataset
 delete_files = not args.keep_files
 is_zeek_input = args.zeek_format or dataset_name == 'zeek'
+use_ics = args.ics
 
 path_to_ini = "FlexFringe/ini/spdfa-config.ini"
 
@@ -411,7 +413,8 @@ state_sequences, severe_sinks = encode_sequences(main_model, sinks_model, episod
 # state_groups = plot_state_groups(state_sequences, path_to_traces)
 
 print('------ Making alert-driven AGs ------')
-make_attack_graphs(state_sequences, severe_sinks, path_to_traces, ag_directory, SAVE_AG)
+mapping_choice = 'ics' if use_ics else 'macro'
+make_attack_graphs(state_sequences, severe_sinks, path_to_traces, ag_directory, SAVE_AG, mapping=mapping_choice)
 
 if delete_files:
     print('Deleting extra files')

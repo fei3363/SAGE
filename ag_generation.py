@@ -1,6 +1,13 @@
 import os
 
-from signatures.mappings import macro_inv, micro, micro2macro, verbose_micro
+from signatures.mappings import (
+    macro_inv,
+    micro,
+    micro2macro,
+    micro2ics,
+    ics_inv,
+    verbose_micro,
+)
 
 
 def _translate(label, root=False):
@@ -193,7 +200,7 @@ def _print_simplicity(ag_name, lines):
 
 
 # Step 7: Create AGs per victim per objective (14 Nov)
-def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=True):
+def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=True, mapping='macro'):
     """
     Creates the attack graphs based on the given state sequences.
 
@@ -202,6 +209,7 @@ def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=T
     @param datafile: the name of the file with the traces (used as a prefix for the file name of the attack graph)
     @param dir_name: the name of the directory where the attack graphs should be saved
     @param save_ag: whether to save the attack graphs (i.e. create dot, png and svg files with the attack graphs)
+    @param mapping: use 'ics' for ICS ATT&CK mapping instead of the default macro mapping
     """
     tcols = {'t0': 'maroon', 't1': 'orange', 't2': 'darkgreen', 't3': 'blue', 't4': 'magenta',
              't5': 'purple', 't6': 'brown', 't7': 'tomato', 't8': 'turquoise', 't9': 'skyblue'}
@@ -214,7 +222,12 @@ def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=T
         else:
             print("Successfully created directory for AGs")
 
-    shapes = ['oval', 'oval', 'oval', 'box', 'box', 'box', 'box', 'hexagon', 'hexagon', 'hexagon', 'hexagon', 'hexagon']
+    if mapping == 'ics':
+        shapes = ['oval', 'oval', 'oval', 'box', 'box', 'box', 'box', 'hexagon',
+                  'hexagon', 'hexagon', 'hexagon', 'hexagon', 'diamond', 'diamond']
+    else:
+        shapes = ['oval', 'oval', 'oval', 'box', 'box', 'box', 'box', 'hexagon',
+                  'hexagon', 'hexagon', 'hexagon', 'hexagon']
     in_main_model = set([episode[3] for sequence in state_sequences.values() for episode in sequence])
     total_victims = set([attacker_victim.split('->')[1] for attacker_victim in state_sequences.keys()])  # Victim IPs
 
@@ -302,7 +315,10 @@ def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=T
             # Go over all vertices again and define their shapes + make high-sev sink states dotted
             for vname, signatures in node_signatures.items():
                 mcat = vname.split('|')[0]
-                mcat = macro_inv[micro2macro['MicroAttackStage.' + mcat]]
+                if mapping == 'ics':
+                    mcat = ics_inv[micro2ics['MicroAttackStage.' + mcat]]
+                else:
+                    mcat = macro_inv[micro2macro['MicroAttackStage.' + mcat]]
                 shape = shapes[mcat]
                 # If it's oval, we don't do anything because it is not a high-sev sink
                 if shape == shapes[0] or vname.split('|')[2] in already_addressed:

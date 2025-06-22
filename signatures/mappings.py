@@ -14,6 +14,24 @@ macro = {
 }
 macro_inv = {v: k for k, v in macro.items()}
 
+ics = {
+    0: "ICSAttackStage.INITIAL_ACCESS",
+    1: "ICSAttackStage.EXECUTION",
+    2: "ICSAttackStage.PERSISTENCE",
+    3: "ICSAttackStage.PRIVILEGE_ESCALATION",
+    4: "ICSAttackStage.DEFENSE_EVASION",
+    5: "ICSAttackStage.CREDENTIAL_ACCESS",
+    6: "ICSAttackStage.DISCOVERY",
+    7: "ICSAttackStage.LATERAL_MOVEMENT",
+    8: "ICSAttackStage.COLLECTION",
+    9: "ICSAttackStage.COMMAND_AND_CONTROL",
+    10: "ICSAttackStage.EXFILTRATION",
+    11: "ICSAttackStage.IMPACT",
+    12: "ICSAttackStage.INHIBIT_RESPONSE_FUNCTION",
+    13: "ICSAttackStage.IMPAIR_PROCESS_CONTROL",
+}
+ics_inv = {v: k for k, v in ics.items()}
+
 micro = {
     0: "MicroAttackStage.INIT",
     1: "MicroAttackStage.TARGET_IDEN",
@@ -89,6 +107,45 @@ micro2macro = {
     "MicroAttackStage.DATA_EXFILTRATION": "MacroAttackStage.DISCLOSURE",
     "MicroAttackStage.DATA_DELIVERY": "MacroAttackStage.DELIVERY",
     "MicroAttackStage.NON_MALICIOUS": "MacroAttackStage.NONE"
+}
+
+micro2ics = {
+    "MicroAttackStage.INIT": "ICSAttackStage.INITIAL_ACCESS",
+    "MicroAttackStage.TARGET_IDEN": "ICSAttackStage.DISCOVERY",
+    "MicroAttackStage.SURFING": "ICSAttackStage.DISCOVERY",
+    "MicroAttackStage.SOCIAL_ENGINEERING": "ICSAttackStage.INITIAL_ACCESS",
+    "MicroAttackStage.HOST_DISC": "ICSAttackStage.DISCOVERY",
+    "MicroAttackStage.SERVICE_DISC": "ICSAttackStage.DISCOVERY",
+    "MicroAttackStage.VULN_DISC": "ICSAttackStage.DISCOVERY",
+    "MicroAttackStage.INFO_DISC": "ICSAttackStage.DISCOVERY",
+    "MicroAttackStage.PRIV_ESC": "ICSAttackStage.PRIVILEGE_ESCALATION",
+    "MicroAttackStage.USER_PRIV_ESC": "ICSAttackStage.PRIVILEGE_ESCALATION",
+    "MicroAttackStage.ROOT_PRIV_ESC": "ICSAttackStage.PRIVILEGE_ESCALATION",
+    "MicroAttackStage.NETWORK_SNIFFING": "ICSAttackStage.DISCOVERY",
+    "MicroAttackStage.BRUTE_FORCE_CREDS": "ICSAttackStage.CREDENTIAL_ACCESS",
+    "MicroAttackStage.ACCT_MANIP": "ICSAttackStage.PERSISTENCE",
+    "MicroAttackStage.TRUSTED_ORG_EXP": "ICSAttackStage.LATERAL_MOVEMENT",
+    "MicroAttackStage.PUBLIC_APP_EXP": "ICSAttackStage.EXECUTION",
+    "MicroAttackStage.REMOTE_SERVICE_EXP": "ICSAttackStage.LATERAL_MOVEMENT",
+    "MicroAttackStage.SPEARPHISHING": "ICSAttackStage.INITIAL_ACCESS",
+    "MicroAttackStage.SERVICE_SPECIFIC": "ICSAttackStage.EXECUTION",
+    "MicroAttackStage.DEFENSE_EVASION": "ICSAttackStage.DEFENSE_EVASION",
+    "MicroAttackStage.COMMAND_AND_CONTROL": "ICSAttackStage.COMMAND_AND_CONTROL",
+    "MicroAttackStage.LATERAL_MOVEMENT": "ICSAttackStage.LATERAL_MOVEMENT",
+    "MicroAttackStage.ARBITRARY_CODE_EXE": "ICSAttackStage.EXECUTION",
+    "MicroAttackStage.END_POINT_DOS": "ICSAttackStage.IMPACT",
+    "MicroAttackStage.NETWORK_DOS": "ICSAttackStage.IMPACT",
+    "MicroAttackStage.SERVICE_STOP": "ICSAttackStage.INHIBIT_RESPONSE_FUNCTION",
+    "MicroAttackStage.RESOURCE_HIJACKING": "ICSAttackStage.IMPACT",
+    "MicroAttackStage.DATA_DESTRUCTION": "ICSAttackStage.IMPACT",
+    "MicroAttackStage.CONTENT_WIPE": "ICSAttackStage.IMPACT",
+    "MicroAttackStage.DATA_ENCRYPTION": "ICSAttackStage.IMPACT",
+    "MicroAttackStage.DEFACEMENT": "ICSAttackStage.IMPACT",
+    "MicroAttackStage.DATA_MANIPULATION": "ICSAttackStage.IMPACT",
+    "MicroAttackStage.DATA_EXFILTRATION": "ICSAttackStage.EXFILTRATION",
+    "MicroAttackStage.DATA_DELIVERY": "ICSAttackStage.INITIAL_ACCESS",
+    "MicroAttackStage.PHISHING": "ICSAttackStage.INITIAL_ACCESS",
+    "MicroAttackStage.NON_MALICIOUS": "ICSAttackStage.DISCOVERY"
 }
 
 mcols = list({(0.8941176470588236, 0.10196078431372549, 0.10980392156862745),

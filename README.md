@@ -22,7 +22,7 @@ Switch to the [`docker` branch](https://github.com/tudelft-cda-lab/SAGE/tree/doc
 
 
 ### Usage
-`python sage.py path_to_json_files experiment_name [-h] [-t T] [-w W] [--timerange STARTRANGE ENDRANGE] [--dataset {cptc,other}] [--keep-files]`
+`python sage.py path_to_json_files experiment_name [-h] [-t T] [-w W] [--timerange STARTRANGE ENDRANGE] [--dataset {cptc,other}] [--keep-files] [--ics]`
 
 **Required positional arguments:**
 
@@ -42,12 +42,14 @@ Switch to the [`docker` branch](https://github.com/tudelft-cda-lab/SAGE/tree/doc
 > Since the IP addresses of the attackers are known for the CPTC dataset, irrelevant alerts are filtered out.
 * `--keep-files`: Do not delete the .dot files after the program ends.
 > By default, the generated dot files with the attack graphs are deleted. They might, however, be useful for analytics or testing.
+* `--ics`: Use ICS ATT&CK mapping when generating attack graphs.
 
 **Examples:**
 
 * Run SAGE with the default parameters on the CPTC-2017 dataset: `python sage.py alerts/cptc-2017/ exp-2017 --dataset cptc`
 * Run SAGE with the time window of 2.0 seconds and the alert aggregation window of 200 seconds on the CPTC-2018 dataset: `python sage.py alerts/cptc-2018/ exp-2018 -t 2.0 -w 200 --dataset cptc`
 * Run SAGE on the CCDC dataset and do not delete the dot files (you can omit `--dataset other`): `python sage.py alerts/ccdc/ exp-ccdc --dataset other --keep-files`
+* Generate graphs using the ICS ATT&CK mapping: `python sage.py alerts/first/ exp-ics --ics`
 
 Tip: in case you often use the same non-default values, you can create an alias (e.g `alias sage="python sage.py -t 1.5 --dataset cptc --keep-files"` and then run `sage alerts/cptc-2017/ exp-2017`)
 
