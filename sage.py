@@ -260,67 +260,132 @@ def load_data(path_to_alerts, filtering_window, start, end):
     return _team_alerts, _team_labels, _team_start_times
 
 
-def group_alerts_per_team(alerts, port_mapping):
-    """
-    Reorganises the alerts per team, for each attacker and victim pair.
 
-    @param alerts: the parsed and filtered alerts, grouped by team
-    @param port_mapping: the IANA port-service mapping
-    @return: alerts grouped by team and by (src_ip, dst_ip)
-    """
-    _team_data = dict()
+def group_alerts_per_team(alerts, port_mapping):
+    _team_data = {}
+
     for tid, team in enumerate(alerts):
-        host_alerts = dict()  # (attacker, victim) -> alerts
+        host_alerts = {}                      # (src ,dst) → [tuple…]
 
         for alert in team:
-            # Alert format: (diff_dt, src_ip, src_port, dst_ip, dst_port, sig, cat, host, ts, mcat)
-            src_ip, dst_ip, signature, ts, mcat = alert[1], alert[3], alert[5], alert[8], alert[9]
-            dst_port = alert[4] if alert[4] is not None else 65000
+            # ------- 既有欄位 (索引 0‥4) -------
+            src_ip, dst_ip  = alert[1], alert[3]
+            signature, ts   = alert[5], alert[8]
+            mcat            = alert[9]
+            dst_port        = alert[4] if alert[4] is not None else 65000
+            raw             = alert[6] if len(alert) > 6 else {}
+            # ------------------------------------
 
-            is_zeek_format = (
-                'zeek' in alert[7].lower()
-                or 'OT_' in signature
-                or 'Modbus' in signature
-                or 'HTTP' in signature
-            )
-
-            if is_zeek_format:
-                if isinstance(dst_port, str) and dst_port != 'unknown':
-                    dst_port_service = dst_port
-                elif dst_port == 502:
-                    dst_port_service = 'modbus'
-                elif dst_port == 80:
-                    dst_port_service = 'http'
-                elif dst_port == 443:
-                    dst_port_service = 'https'
-                elif dst_port in port_mapping:
-                    dst_port_service = port_mapping[dst_port]['name']
-                else:
-                    dst_port_service = 'unknown'
+            # ------- 決定 service -------
+            if isinstance(raw, dict) and raw.get("service"):
+                dst_port_service = raw["service"]                 # Zeek 自帶
+            elif dst_port in port_mapping:
+                dst_port_service = port_mapping[dst_port]["name"] # IANA
             else:
-                if dst_port not in port_mapping or port_mapping[dst_port] == 'unknown':
-                    dst_port_service = 'unknown'
-                else:
-                    dst_port_service = port_mapping[dst_port]['name']
+                dst_port_service = f"port-{dst_port}"             # 備援
+            # ------------------------------------
 
-            # For the CPTC dataset, attacker IPs (src_ip) start with '10.0.254', but this prefix might also be in dst_ip
-            # TODO: for the future, we might want to address internal paths
-            if dataset_name == 'cptc' and not src_ip.startswith('10.0.254') and not dst_ip.startswith('10.0.254'):
+            # ------- 取 Modbus 細節 -------
+            func   = raw.get("modbus_func")   if isinstance(raw, dict) else None
+            addr   = raw.get("modbus_addr")   if isinstance(raw, dict) else None
+            length = raw.get("modbus_count")  if isinstance(raw, dict) else None
+            data   = raw.get("modbus_data")   if isinstance(raw, dict) else None
+            # 將細節直接拼進 signature → 後續函式都能看見
+            sig_detail = signature
+            if func is not None:  # 有 Modbus 才加
+                sig_detail += f" | FC={func} addr={addr} len={length} data={data}"
+            # ------------------------------------
+
+            # ------- CPTC 方向修正 (如有需要保留) -------
+            if dataset_name == "cptc" and not src_ip.startswith("10.0.254") \
+                                     and not dst_ip.startswith("10.0.254"):
                 continue
-            # Swap src_ip and dst_ip, so that the prefix '10.0.254' is in src_ip
-            if dataset_name == 'cptc' and dst_ip.startswith('10.0.254'):
+            if dataset_name == "cptc" and dst_ip.startswith("10.0.254"):
                 src_ip, dst_ip = dst_ip, src_ip
+            # -----------------------------------------
 
-            if (src_ip, dst_ip) not in host_alerts.keys() and (dst_ip, src_ip) not in host_alerts.keys():
-                host_alerts[(src_ip, dst_ip)] = []
+            # ------- 建立 / 追加 -------
+            key_fwd = (src_ip, dst_ip)
+            key_rev = (dst_ip, src_ip)
+            if key_fwd not in host_alerts and key_rev not in host_alerts:
+                host_alerts[key_fwd] = []
 
-            if (src_ip, dst_ip) in host_alerts.keys():  # TODO: remove the redundant host names
-                host_alerts[(src_ip, dst_ip)].append((dst_ip, mcat, ts, dst_port_service, signature))
+            record = (dst_ip, mcat, ts, dst_port_service, sig_detail)  # 只有 5 欄
+            if key_fwd in host_alerts:
+                host_alerts[key_fwd].append(record)
             else:
-                host_alerts[(dst_ip, src_ip)].append((src_ip, mcat, ts, dst_port_service, signature))
+                host_alerts[key_rev].append((src_ip, mcat, ts, dst_port_service, sig_detail))
+            # -----------------------------------------
 
         _team_data[tid] = host_alerts.items()
+
     return _team_data
+
+
+# OLD 
+# def group_alerts_per_team(alerts, port_mapping):
+#     """
+#     Reorganises the alerts per team, for each attacker and victim pair.
+
+#     @param alerts: the parsed and filtered alerts, grouped by team
+#     @param port_mapping: the IANA port-service mapping
+#     @return: alerts grouped by team and by (src_ip, dst_ip)
+#     """
+#     _team_data = dict()
+#     for tid, team in enumerate(alerts):
+#         host_alerts = dict()  # (attacker, victim) -> alerts
+
+#         for alert in team:
+#             # Alert format: (diff_dt, src_ip, src_port, dst_ip, dst_port, sig, cat, host, ts, mcat)
+#             src_ip, dst_ip, signature, ts, mcat = alert[1], alert[3], alert[5], alert[8], alert[9]
+#             dst_port = alert[4] if alert[4] is not None else 65000
+
+#             is_zeek_format = (
+#                 'zeek' in alert[7].lower()
+#                 or 'OT_' in signature
+#                 or 'Modbus' in signature
+#                 or 'HTTP' in signature
+#             )
+
+#             if is_zeek_format:
+#                 if isinstance(dst_port, str) and dst_port != 'unknown':
+#                     dst_port_service = dst_port
+#                 elif dst_port == 502:
+#                     dst_port_service = 'modbus'
+#                 elif dst_port == 80:
+#                     dst_port_service = 'http'
+#                 elif dst_port == 443:
+#                     dst_port_service = 'https'
+#                 elif dst_port in port_mapping:
+#                     dst_port_service = port_mapping[dst_port]['name']
+#                 else:
+#                     # dst_port_service = 'unknown'
+#                     dst_port_service = f"port-{dst_port}" 
+#             else:
+#                 if dst_port not in port_mapping or port_mapping[dst_port] == 'unknown':
+#                     # dst_port_service = 'unknown'
+#                     dst_port_service = f"port-{dst_port}" 
+#                 else:
+#                     dst_port_service = port_mapping[dst_port]['name']
+
+#             # For the CPTC dataset, attacker IPs (src_ip) start with '10.0.254', but this prefix might also be in dst_ip
+#             # TODO: for the future, we might want to address internal paths
+#             if dataset_name == 'cptc' and not src_ip.startswith('10.0.254') and not dst_ip.startswith('10.0.254'):
+#                 continue
+#             # Swap src_ip and dst_ip, so that the prefix '10.0.254' is in src_ip
+#             if dataset_name == 'cptc' and dst_ip.startswith('10.0.254'):
+#                 src_ip, dst_ip = dst_ip, src_ip
+
+#             if (src_ip, dst_ip) not in host_alerts.keys() and (dst_ip, src_ip) not in host_alerts.keys():
+#                 host_alerts[(src_ip, dst_ip)] = []
+
+#             if (src_ip, dst_ip) in host_alerts.keys():  # TODO: remove the redundant host names
+#                 host_alerts[(src_ip, dst_ip)].append((dst_ip, mcat, ts, dst_port_service, signature))
+#             else:
+#                 host_alerts[(dst_ip, src_ip)].append((src_ip, mcat, ts, dst_port_service, signature))
+
+#         _team_data[tid] = host_alerts.items()
+#     return _team_data
 
 
 # ----- MAIN ------
