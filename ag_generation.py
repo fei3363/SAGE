@@ -264,6 +264,7 @@ def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=T
             # -----------------------------------------------------------------
             node_signatures = {}         # vname -> set(str)
             already_addressed = set()    # 已 dotted 的 sink label
+            seen_edges = set()
 
             for team_att, attempts in team_attempts.items():
                 color = tcols[team_att.split('-')[0]]
@@ -293,7 +294,10 @@ def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=T
                         edge_line = _create_edge_line(
                             idx, v1, v2, ts1, ts2, color, team_att.split('-')[1]
                         )
-                        lines.append((t1, edge_line))
+                        key = (v1, v2, team_att.split('-')[1])
+                        if key not in seen_edges:
+                            lines.append((t1, edge_line))
+                            seen_edges.add(key)
 
             # --------- 針對所有節點補 shape、tooltip ---------
             for vname, sigset in node_signatures.items():

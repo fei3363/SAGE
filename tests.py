@@ -108,6 +108,49 @@ expected = [(0, 1), (6, 8), (15, 17), (196, 197)]
 run_episode_test(y, expected, "Test case 14: ramp up at end")
 
 
+def run_duplicate_edges_test():
+    global passed_tests
+    global total_tests
+
+    print("Running test \"Duplicate edges removed\"")
+
+    from datetime import datetime
+    import os
+    from ag_generation import make_attack_graphs
+
+    state_sequences = {
+        't0-1.1.1.1->2.2.2.2': [
+            (0, 1, 20, 1, 'http', {'sig'}, (datetime(2020, 1, 1, 0, 0), datetime(2020, 1, 1, 0, 1))),
+            (1, 2, 21, 2, 'http', {'sig'}, (datetime(2020, 1, 1, 0, 1), datetime(2020, 1, 1, 0, 2))),
+            (2, 3, 110, 3, 'http', {'sig'}, (datetime(2020, 1, 1, 0, 2), datetime(2020, 1, 1, 0, 3))),
+            (100, 101, 20, 4, 'http', {'sig'}, (datetime(2020, 1, 1, 1, 0), datetime(2020, 1, 1, 1, 1))),
+            (101, 102, 21, 5, 'http', {'sig'}, (datetime(2020, 1, 1, 1, 1), datetime(2020, 1, 1, 1, 2))),
+            (102, 103, 110, 6, 'http', {'sig'}, (datetime(2020, 1, 1, 1, 2), datetime(2020, 1, 1, 1, 3))),
+        ]
+    }
+
+    os.makedirs('ag_test_output', exist_ok=True)
+    orig_system = os.system
+    os.system = lambda cmd: 0
+    make_attack_graphs(state_sequences, set(), 'testdata', 'ag_test_output', save_ag=True)
+    os.system = orig_system
+
+    dot_path = 'ag_test_output/testdata-attack-graph-for-victim-2.2.2.2-DATADELIVERYhttp.dot'
+    with open(dot_path) as fh:
+        lines = fh.readlines()
+    edge_lines = [l for l in lines if 'color=maroon' in l and '->' in l]
+
+    if len(edge_lines) == 2:
+        print('Pass')
+        passed_tests += 1
+    else:
+        print(f'Fail: expected 2 edges but found {len(edge_lines)}')
+    total_tests += 1
+
+
+run_duplicate_edges_test()
+
+
 print(f"Tests passed {passed_tests }/{total_tests}")
 
 if passed_tests != total_tests:
