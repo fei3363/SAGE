@@ -9,7 +9,8 @@ def _translate(label, root=False):
 
     @param label: the label of the node (`mcat|mserv` or `mcat|mserv|state_ID`, where `mcat` is a string mapped from the `micro` dictionary, e.g. `DATA_DELIVERY|http|36`)
     @param root: whether this node is a root node (will be prepended with 'Victim: <victim_ip>\n')
-    @return: a new more human-readable version of the label
+    @return: a new more human-readable version of the label. The state ID is
+        appended only when it is not "-1".
     """
     new_label = ""
     parts = label.split("|")
@@ -23,7 +24,7 @@ def _translate(label, root=False):
             new_label += "\n" + parts[1].upper()
         else:
             new_label += "\n" + parts[1]
-    if len(parts) >= 3:
+    if len(parts) >= 3 and parts[2] != '-1':
         new_label += " | ID: " + parts[2]
 
     return new_label
