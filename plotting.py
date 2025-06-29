@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from signatures.attack_stages import MicroAttackStage
-from signatures.mappings import macro_inv, mcols, micro, micro2macro
+from signatures.mappings import macro_inv, mcols, micro, micro2macro, verbose_micro
 
 
 def plot_alert_filtering(unfiltered_alerts, filtered_alerts):
@@ -47,7 +47,7 @@ def plot_alert_filtering(unfiltered_alerts, filtered_alerts):
     plt.bar(r1, bars1, color='skyblue', width=bar_width, edgecolor='white', label='Raw')
     plt.bar(r2, bars2, color='salmon', width=bar_width, edgecolor='white', label='Cleaned')
 
-    labels = [micro[x].split('.')[1] for x in b1.keys()]
+    labels = [verbose_micro[micro[x].split('.')[1]] for x in b1.keys()]
 
     # Add xticks in the middle of the group bars
     plt.ylabel('Frequency', fontweight='bold', fontsize='20')
@@ -199,7 +199,7 @@ def plot_alert_volume_per_episode(tid, attacker_victim, host_episodes, mcats):
                 markersize=msize, label=micro2macro[micro[ep[2]]])
         ax.plot(ep[1], mcats.index(ep[2]), color=mcols[macro_inv[micro2macro[micro[ep[2]]]]], marker='.', linewidth=0,
                 markersize=msize)
-        plt.yticks(range(len(mcats)), [x.split('.')[1] for x in micro.values()], rotation=0)
+        plt.yticks(range(len(mcats)), [verbose_micro[x.split('.')[1]] for x in micro.values()], rotation=0)
     _legend_without_duplicate_labels(ax)
     plt.grid(True, alpha=0.4)
 

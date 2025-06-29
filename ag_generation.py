@@ -17,7 +17,7 @@ def _translate(label, root=False):
         new_label += 'Victim: ' + str(root) + '\n'
 
     if len(parts) >= 1:
-        new_label += verbose_micro[parts[0]]
+        new_label += verbose_micro.get(parts[0], parts[0])
     if len(parts) >= 2:
         if parts[1] in ['modbus', 'http', 'https', 'ssh', 'telnet', 'ftp', 'smtp']:
             new_label += "\n" + parts[1].upper()
