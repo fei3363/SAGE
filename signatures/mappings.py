@@ -50,6 +50,13 @@ micro = {
     109: "MicroAttackStage.DATA_EXFILTRATION",
     110: "MicroAttackStage.DATA_DELIVERY",
     111: "MicroAttackStage.PHISHING",
+    200: "MicroAttackStage.POINT_AND_TAG_IDENTIFICATION",
+    201: "MicroAttackStage.PROGRAM_DOWNLOAD",
+    202: "MicroAttackStage.PROGRAM_UPLOAD",
+    203: "MicroAttackStage.MODIFY_CONTROLLER_TASKING",
+    204: "MicroAttackStage.MODIFY_CONTROL_LOGIC",
+    205: "MicroAttackStage.MODIFY_PARAMETERS",
+    206: "MicroAttackStage.CHANGE_OPERATING_MODE",
     999: "MicroAttackStage.NON_MALICIOUS"
 }
 micro_inv = {v: k for k, v in micro.items()}
@@ -88,6 +95,13 @@ micro2macro = {
     "MicroAttackStage.DATA_MANIPULATION": "MacroAttackStage.DISTORT",
     "MicroAttackStage.DATA_EXFILTRATION": "MacroAttackStage.DISCLOSURE",
     "MicroAttackStage.DATA_DELIVERY": "MacroAttackStage.DELIVERY",
+    "MicroAttackStage.POINT_AND_TAG_IDENTIFICATION": "MacroAttackStage.ACTIVE_RECON",
+    "MicroAttackStage.PROGRAM_DOWNLOAD": "MacroAttackStage.TARGETED_EXP",
+    "MicroAttackStage.PROGRAM_UPLOAD": "MacroAttackStage.TARGETED_EXP",
+    "MicroAttackStage.MODIFY_CONTROLLER_TASKING": "MacroAttackStage.TARGETED_EXP",
+    "MicroAttackStage.MODIFY_CONTROL_LOGIC": "MacroAttackStage.TARGETED_EXP",
+    "MicroAttackStage.MODIFY_PARAMETERS": "MacroAttackStage.TARGETED_EXP",
+    "MicroAttackStage.CHANGE_OPERATING_MODE": "MacroAttackStage.TARGETED_EXP",
     "MicroAttackStage.NON_MALICIOUS": "MacroAttackStage.NONE"
 }
 
@@ -170,6 +184,13 @@ small_mapping = {
     109: "exfil",
     110: "delivery",
     111: "phish",
+    200: "ptTagId",
+    201: "progDown",
+    202: "progUp",
+    203: "modCtrlTask",
+    204: "modCtrlLogic",
+    205: "modParam",
+    206: "chgOpMode",
     999: "benign"
 }
 rev_smallmapping = dict([(value, key) for key, value in small_mapping.items()])
@@ -210,6 +231,13 @@ verbose_micro = {
     "DATA_EXFILTRATION": "DATA EXFILTRATION",
     "DATA_DELIVERY": "DATA DELIVERY",
     "PHISHING": "PHISHING",
+    "POINT_AND_TAG_IDENTIFICATION": "POINT & TAG IDENTIFICATION (T0842)",
+    "PROGRAM_DOWNLOAD": "PROGRAM DOWNLOAD (T0843)",
+    "PROGRAM_UPLOAD": "PROGRAM UPLOAD (T0844)",
+    "MODIFY_CONTROLLER_TASKING": "MODIFY CONTROLLER TASKING (T0857)",
+    "MODIFY_CONTROL_LOGIC": "MODIFY CONTROL LOGIC (T0851)",
+    "MODIFY_PARAMETERS": "MODIFY PARAMETERS (T0831)",
+    "CHANGE_OPERATING_MODE": "CHANGE OPERATING MODE (T0803)",
     "NON_MALICIOUS": "NOT MALICIOUS"
 }
 

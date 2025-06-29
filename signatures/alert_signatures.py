@@ -1023,19 +1023,19 @@ zeek_mapping = {
     "Modbus MASK_WRITE_REGISTER_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
 
     # OT related
-    "OT_Scan_NonStandard_Port": MicroAttackStage.SERVICE_DISC,
-    "OT_Modbus_Write": MicroAttackStage.DATA_MANIPULATION,
-    "OT_HTTP_Suspicious_URI": MicroAttackStage.PUBLIC_APP_EXP,
+    "OT_Scan_NonStandard_Port": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
+    "OT_Modbus_Write": MicroAttackStage.MODIFY_PARAMETERS,
+    "OT_HTTP_Suspicious_URI": MicroAttackStage.PROGRAM_UPLOAD,
 
     # Modbus
-    "Modbus Write Single Coil": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus Write Single Register": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus Write Multiple Coils": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus Write Multiple Registers": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus Read Coils": MicroAttackStage.INFO_DISC,
-    "Modbus Read Discrete Inputs": MicroAttackStage.INFO_DISC,
-    "Modbus Read Holding Registers": MicroAttackStage.INFO_DISC,
-    "Modbus Read Input Registers": MicroAttackStage.INFO_DISC,
+    "Modbus Write Single Coil": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus Write Single Register": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus Write Multiple Coils": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus Write Multiple Registers": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus Read Coils": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
+    "Modbus Read Discrete Inputs": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
+    "Modbus Read Holding Registers": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
+    "Modbus Read Input Registers": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
 
     # HTTP
     "HTTP Suspicious URI": MicroAttackStage.PUBLIC_APP_EXP,

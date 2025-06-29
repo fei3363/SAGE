@@ -72,6 +72,22 @@ Tip: in case you often use the same non-default values, you can create an alias 
 
 - For other options, see Usage section above.
 
+### ATT&CK for ICS support
+
+SAGE now recognizes a number of ATT&CK for ICS techniques. When alerts are
+translated into attack stages the corresponding ATT&CK for ICS name is used in
+the attack graphs and plotting utilities.
+
+Example using Zeek logs:
+
+```
+python zeek_to_sage.py /path/to/zeek/logs zeek_alerts.json
+python sage.py zeek_alerts.json exp-ics
+```
+
+This will generate graphs with nodes such as "POINT & TAG IDENTIFICATION" or
+"MODIFY PARAMETERS" according to the ATT&CK for ICS technique taxonomy.
+
 **If you use SAGE in a scientific work, consider citing the following papers:**
 
 ```
