@@ -57,7 +57,7 @@ fi
 # Put the name of the edge (i.e. "src->dst") next to the label of the edge (time metadata), separated by a "#"
 parse_edges(){
     # Format of an edge with an attacker label after executing the `gvpr` script
-    # ARBITRARY CODE EXECUTION|ftp | ID: -1->ROOT PRIVILEGE ESCALATION|ms-wbt-server | ID: -1	<font color="magenta"> start_next: 04/11/17, 17:47:40<br/>gap: 4373sec<br/>end_prev: 04/11/17, 16:34:47</font><br/><font color="magenta"><b>Attacker: 10.0.254.31</b></font>
+    # ARBITRARY CODE EXECUTION|ftp -> ROOT PRIVILEGE ESCALATION|ms-wbt-server | ID: 42	<font color="magenta"> start_next: 04/11/17, 17:47:40<br/>gap: 4373sec<br/>end_prev: 04/11/17, 16:34:47</font><br/><font color="magenta"><b>Attacker: 10.0.254.31</b></font>
     edges=$(gvpr '
         E [$.label == ""] { print(gsub(gsub($.name, "\r"), "\n", " | ")); }     // For edges without labels, simply print their names
         E [$.label != "" ] {                                                    // For edges with labels, print their names and labels
