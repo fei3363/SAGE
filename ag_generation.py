@@ -30,19 +30,38 @@ def _translate(label, root=False):
     return new_label
 
 
-def _get_objective_nodes(state_sequences, obj_only=False):
+def _get_objective_nodes(state_sequences, obj_only=False, severity_levels=None):
     """
     Gets the objectives from the state sequences. An objective is defined as `mcat|mserv` (by default),
-        with `mcat` having a high severity.
+        with `mcat` having a specified severity level.
 
     @param state_sequences: the state sequences per attacker-victim pair
     @param obj_only: whether to use only `mcat` (instead of `mcat|mserv`)
+    @param severity_levels: list of severity levels to include. Options:
+                           - 'low': values < 10 (reconnaissance, discovery)
+                           - 'medium': values 10-99 (exploitation, privilege escalation)
+                           - 'high': values >= 100 (impact, data manipulation)
+                           - None or ['high']: default behavior (only high severity)
     @return: a list of the found objective nodes
     """
+    if severity_levels is None:
+        severity_levels = ['high']
+    
     objectives = set()
     for episodes in state_sequences.values():  # Iterate over all episodes and collect the objective nodes
         for epi in episodes:
-            if len(str(epi[2])) == 3:  # If high-severity, then include it
+            severity_value = epi[2]
+            include = False
+            
+            # Check if this episode matches the requested severity levels
+            if 'low' in severity_levels and severity_value < 10:
+                include = True
+            if 'medium' in severity_levels and 10 <= severity_value < 100:
+                include = True
+            if 'high' in severity_levels and severity_value >= 100:
+                include = True
+            
+            if include:
                 mcat = micro[epi[2]].split('.')[1]
                 if obj_only:  # Experiment: only mcat or mcat + mserv?
                     vert_name = mcat
@@ -108,8 +127,24 @@ def _get_attack_attempts(state_sequences, victim, objective, in_main_model):
         for epi in episodes:
             vertices.append(_make_vertex_info(epi, in_main_model))
 
+        # Debug: print vertices to understand the issue
+        # print(f"      DEBUG: Checking objective '{objective}' against vertices:")
+        # for v in vertices:
+        #     print(f"        Vertex: {v[0]}")
+        
         # If the objective is never reached, don't process further
-        if not sum([True if objective.split("|")[:2] == v[0].split("|")[:2] else False for v in vertices]):
+        # For low severity nodes, the objective might not have a state ID, so we need to handle both cases
+        obj_parts = objective.split("|")
+        objective_reached = False
+        for v in vertices:
+            v_parts = v[0].split("|")
+            # Check if the mcat and service match
+            if len(obj_parts) >= 2 and len(v_parts) >= 2:
+                if obj_parts[0] == v_parts[0] and obj_parts[1] == v_parts[1]:
+                    objective_reached = True
+                    break
+        
+        if not objective_reached:
             continue
 
         # If it's an episode sequence targeting the requested victim and obtaining the requested objective
@@ -117,11 +152,16 @@ def _get_attack_attempts(state_sequences, victim, objective, in_main_model):
         sub_attempt = []
         for vertex in vertices:  # Cut each attempt until the requested objective
             sub_attempt.append(vertex)  # Add the vertex in path
-            if objective.split("|")[:2] == vertex[0].split("|")[:2]:  # If it's the objective
-                if len(sub_attempt) <= 1:  # If only a single node, reject
-                    sub_attempt = []
+            # Check if this vertex matches the objective (mcat and service)
+            obj_parts = objective.split("|")
+            v_parts = vertex[0].split("|")
+            if len(obj_parts) >= 2 and len(v_parts) >= 2 and obj_parts[0] == v_parts[0] and obj_parts[1] == v_parts[1]:
+                # For low severity events, even single node attempts are valid
+                # (e.g., reconnaissance activities might be isolated events)
+                if len(sub_attempt) >= 1:
+                    attempts.append(sub_attempt)
+                else:
                     continue
-                attempts.append(sub_attempt)
                 sub_attempt = []
                 observed_obj.add(vertex[0])
                 continue
@@ -197,12 +237,16 @@ def _print_simplicity(ag_name, lines):
 # ---------------------------------------------------------------------------
 # Step 7: Create AGs per victim per objective (14 Nov)   ★ 完整修正版 ★
 # ---------------------------------------------------------------------------
-def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=True):
+def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=True, severity_levels=None):
     """
     Render attack-graphs (AGs) for each victim/objective pair.
 
     - 前 5 欄索引保持不變；signature 已含 OT 協定細節
     - tooltip 直接使用 action[3] (signatures)
+    
+    @param severity_levels: list of severity levels to include in attack graphs.
+                           Options: ['low'], ['medium'], ['high'], or combinations like ['low', 'medium']
+                           Default: ['high'] (only high severity objectives)
     """
     import os, re
     tcols = {
@@ -224,7 +268,28 @@ def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=T
 
     in_main_model = {epi[3] for seq in state_sequences.values() for epi in seq}
     total_victims = {av.split('->')[1] for av in state_sequences.keys()}
-    objectives     = _get_objective_nodes(state_sequences)
+    objectives     = _get_objective_nodes(state_sequences, severity_levels=severity_levels)
+    
+    # Print information about severity levels being used
+    if severity_levels is None:
+        print('Using default severity levels: high only')
+    else:
+        print(f'Using severity levels: {", ".join(severity_levels)}')
+    
+    if not objectives:
+        print(f'No objectives found for severity levels: {severity_levels or ["high"]}')
+        print('Available severity levels in data:')
+        all_severities = set()
+        for episodes in state_sequences.values():
+            for epi in episodes:
+                if epi[2] < 10:
+                    all_severities.add('low')
+                elif epi[2] < 100:
+                    all_severities.add('medium')
+                else:
+                    all_severities.add('high')
+        print(f'  Found: {", ".join(sorted(all_severities))}')
+        return
 
     for victim in total_victims:
         print('!!! Rendering AGs for Victim', victim)
@@ -235,6 +300,7 @@ def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=T
                 state_sequences, victim, obj, in_main_model
             )
             if not any(team_attempts.values()):    # 無人觸發此 objective
+                print('\t     No attack attempts found for this objective')
                 continue
 
             ag_name = re.sub(r'[|_\-\(\)]', '', obj)

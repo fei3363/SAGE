@@ -992,60 +992,88 @@ recent_suricata_alerts = {
     "ETPRO TROJAN TDrop CnC Checkin": MicroAttackStage.COMMAND_AND_CONTROL,
 }
 
-# Mapping for Zeek specific alerts produced by the zeek_to_sage converter
+
+# ICS-specific technique ID to MicroAttackStage mapping (deprecated - use attck_ics_mapping.py)
+# This mapping is kept for backward compatibility
+ics_micro_stages = {
+    "T0803": "MicroAttackStage.BLOCK_COMMAND_MESSAGE",  # Corrected
+    "T0836": "MicroAttackStage.MODIFY_PARAMETERS",      # Corrected from T0831
+    "T0861": "MicroAttackStage.POINT_AND_TAG_IDENTIFICATION",  # Corrected from T0842
+    "T0843": "MicroAttackStage.PROGRAM_DOWNLOAD",
+    "T0845": "MicroAttackStage.PROGRAM_UPLOAD",         # Corrected from T0844
+    "T0889": "MicroAttackStage.MODIFY_PROGRAM",         # Corrected from T0851
+    "T0821": "MicroAttackStage.MODIFY_CONTROLLER_TASKING"  # Corrected from T0857
+}
+
+# Zeek mapping organized by ATT&CK for ICS tactics
 zeek_mapping = {
-
-    "Modbus READ_COILS": MicroAttackStage.INFO_DISC,
-    "Modbus READ_COILS_EXCEPTION": MicroAttackStage.INFO_DISC,
-    "Modbus READ_DISCRETE_INPUTS": MicroAttackStage.INFO_DISC,
-    "Modbus READ_DISCRETE_INPUTS_EXCEPTION": MicroAttackStage.INFO_DISC,
-    "Modbus READ_HOLDING_REGISTERS": MicroAttackStage.INFO_DISC,
-    "Modbus READ_HOLDING_REGISTERS_EXCEPTION": MicroAttackStage.INFO_DISC,
-    "Modbus READ_INPUT_REGISTERS": MicroAttackStage.INFO_DISC,
-    "Modbus READ_INPUT_REGISTERS_EXCEPTION": MicroAttackStage.INFO_DISC,
-    "Modbus READ_FILE_RECORD": MicroAttackStage.INFO_DISC,
-    "Modbus READ_FILE_RECORD_EXCEPTION": MicroAttackStage.INFO_DISC,
-
-    "Modbus WRITE_SINGLE_COIL": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus WRITE_SINGLE_COIL_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus WRITE_SINGLE_REGISTER": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus WRITE_SINGLE_REGISTER_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus WRITE_MULTIPLE_COILS": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus WRITE_MULTIPLE_COILS_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus WRITE_MULTIPLE_REGISTERS": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus WRITE_MULTIPLE_REGISTERS_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus WRITE_FILE_RECORD": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus WRITE_FILE_RECORD_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
-
-    "Modbus READ_WRITE_MULTIPLE_REGISTERS": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus READ_WRITE_MULTIPLE_REGISTERS_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus MASK_WRITE_REGISTER": MicroAttackStage.DATA_MANIPULATION,
-    "Modbus MASK_WRITE_REGISTER_EXCEPTION": MicroAttackStage.DATA_MANIPULATION,
-
-    # OT related
-    "OT_Scan_NonStandard_Port": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
-    "OT_Modbus_Write": MicroAttackStage.MODIFY_PARAMETERS,
-    "OT_HTTP_Suspicious_URI": MicroAttackStage.PROGRAM_UPLOAD,
-
-    # Modbus
-    "Modbus Write Single Coil": MicroAttackStage.MODIFY_PARAMETERS,
-    "Modbus Write Single Register": MicroAttackStage.MODIFY_PARAMETERS,
-    "Modbus Write Multiple Coils": MicroAttackStage.MODIFY_PARAMETERS,
-    "Modbus Write Multiple Registers": MicroAttackStage.MODIFY_PARAMETERS,
+    # ========== Initial Access (初始存取) ==========
+    # T0819 - Exploit Public-Facing Application
+    "OT_HTTP_Suspicious_URI": MicroAttackStage.EXPLOIT_PUBLIC_FACING_APP_ICS,
+    
+    # ========== Evasion (規避) ==========
+    # T0820 - Exploitation for Evasion
+    "OT_Frame_Stacking": MicroAttackStage.EXPLOITATION_FOR_EVASION,
+    "OT_Length_Manipulation": MicroAttackStage.EXPLOITATION_FOR_EVASION,
+    
+    # ========== Discovery (探索) ==========
+    # T0840 - Network Connection Enumeration
+    "OT_Scan_NonStandard_Port": MicroAttackStage.NETWORK_CONNECTION_ENUMERATION,
+    
+    # T0846 - Remote System Discovery  
+    "OT_Reconnaissance": MicroAttackStage.REMOTE_SYSTEM_DISCOVERY_ICS,
+    
+    # T0861 - Point & Tag Identification
+    "Modbus READ_COILS": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
+    "Modbus READ_DISCRETE_INPUTS": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
+    "Modbus READ_HOLDING_REGISTERS": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
+    "Modbus READ_INPUT_REGISTERS": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
     "Modbus Read Coils": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
     "Modbus Read Discrete Inputs": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
     "Modbus Read Holding Registers": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
     "Modbus Read Input Registers": MicroAttackStage.POINT_AND_TAG_IDENTIFICATION,
-
-    # HTTP
-    "HTTP Suspicious URI": MicroAttackStage.PUBLIC_APP_EXP,
-    "HTTP POST Request": MicroAttackStage.DATA_DELIVERY,
-
-    # Generic connection alerts
-    "Scan": MicroAttackStage.SERVICE_DISC,
-    "Brute_Force": MicroAttackStage.BRUTE_FORCE_CREDS,
-    "Failed_Auth": MicroAttackStage.BRUTE_FORCE_CREDS,
+    
+    # ========== Lateral Movement (橫向移動) ==========
+    # T0843 - Program Download
+    "Modbus WRITE_FILE_RECORD": MicroAttackStage.PROGRAM_DOWNLOAD,
+    
+    # ========== Collection (收集) ==========
+    # T0893 - Data from Local System
+    "Modbus READ_FILE_RECORD": MicroAttackStage.DATA_FROM_LOCAL_SYSTEM_ICS,
+    
+    # ========== Inhibit Response Function (抑制響應功能) ==========
+    # T0814 - Denial of Service
+    "OT_Query_Flooding": MicroAttackStage.DENIAL_OF_SERVICE_ICS,
+    "OT_Delay_Response_Attack": MicroAttackStage.DENIAL_OF_SERVICE_ICS,
+    
+    # ========== Impair Process Control (損害程序控制) ==========
+    # T0855 - Unauthorized Command Message
+    "OT_Replay_Attack": MicroAttackStage.UNAUTHORIZED_COMMAND_MESSAGE,
+    "OT_Baseline_Replay_Attack": MicroAttackStage.UNAUTHORIZED_COMMAND_MESSAGE,
+    
+    # T0836 - Modify Parameters
+    "OT_Modbus_Write": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus WRITE_SINGLE_COIL": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus WRITE_SINGLE_REGISTER": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus WRITE_MULTIPLE_COILS": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus WRITE_MULTIPLE_REGISTERS": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus Write Single Coil": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus Write Single Register": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus Write Multiple Coils": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus Write Multiple Registers": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus READ_WRITE_MULTIPLE_REGISTERS": MicroAttackStage.MODIFY_PARAMETERS,
+    "Modbus MASK_WRITE_REGISTER": MicroAttackStage.MODIFY_PARAMETERS,
+    
+    # T0821 - Modify Controller Tasking
+    "OT_Payload_Injection": MicroAttackStage.MODIFY_CONTROLLER_TASKING,
+    
+    # T0856 - Spoof Reporting Message
+    "OT_False_Data_Injection": MicroAttackStage.SPOOF_REPORTING_MESSAGE,
+    
+    # T0806 - Brute Force I/O
+    "OT_Modbus_Brute_Force": MicroAttackStage.BRUTE_FORCE_IO,
 }
+
 
 attack_stage_mapping = {
     MicroAttackStage.END_POINT_DOS: endpointDoS_signatures,
