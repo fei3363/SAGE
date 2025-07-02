@@ -4,6 +4,8 @@ set -e
 
 if [ "$#" -lt 2 ]; then
     echo "Usage: $0 zeek_logs_dir experiment_name [sage_options]"
+    echo "Example: $0 /path/to/logs exp1 --severity low medium high"
+    echo "         $0 /path/to/logs exp2 --severity low --timerange 0 50"
     exit 1
 fi
 
@@ -91,7 +93,7 @@ fi
 SUMMARY_FILE="$PROJECT_DIR/summary.txt"
 echo "=== SAGE Analysis Summary ===" > "$SUMMARY_FILE"
 echo "Experiment Name: $EXP_NAME" >> "$SUMMARY_FILE"
-echo "Date: $(date)" >> "$SUMMARY_FILE"
+echo "Date: $(date +%Y.%m.%d_%H:%M:%S)" >> "$SUMMARY_FILE"
 echo "Input Directory: $ZEEK_DIR" >> "$SUMMARY_FILE"
 echo "SAGE Options: $SAGE_OPTIONS" >> "$SUMMARY_FILE"
 echo "" >> "$SUMMARY_FILE"
