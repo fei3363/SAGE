@@ -1,0 +1,93 @@
+[
+  {
+    "attack": "Baselinereplay",
+    "event_types": 20,
+    "sequences": [],
+    "tree_stats": {
+      "total_states": 1,
+      "max_depth": 0,
+      "branching_factor": 0,
+      "sequence_count": 0
+    },
+    "processing_time": 1.0013580322265625e-05,
+    "detection_issues": []
+  },
+  {
+    "attack": "Falseinjection",
+    "event_types": 20,
+    "sequences": [],
+    "tree_stats": {
+      "total_states": 1,
+      "max_depth": 0,
+      "branching_factor": 0,
+      "sequence_count": 0
+    },
+    "processing_time": 5.4836273193359375e-06,
+    "detection_issues": []
+  },
+  {
+    "attack": "Modifylengthparameters",
+    "event_types": 20,
+    "sequences": [],
+    "tree_stats": {
+      "total_states": 1,
+      "max_depth": 0,
+      "branching_factor": 0,
+      "sequence_count": 0
+    },
+    "processing_time": 4.5299530029296875e-06,
+    "detection_issues": []
+  },
+  {
+    "attack": "Queryflooding",
+    "event_types": 20,
+    "sequences": [],
+    "tree_stats": {
+      "total_states": 1,
+      "max_depth": 0,
+      "branching_factor": 0,
+      "sequence_count": 0
+    },
+    "processing_time": 3.814697265625e-06,
+    "detection_issues": []
+  },
+  {
+    "attack": "Reconnaissance",
+    "event_types": 20,
+    "sequences": [],
+    "tree_stats": {
+      "total_states": 1,
+      "max_depth": 0,
+      "branching_factor": 0,
+      "sequence_count": 0
+    },
+    "processing_time": 3.814697265625e-06,
+    "detection_issues": []
+  },
+  {
+    "attack": "Stackmodbusframes",
+    "event_types": 20,
+    "sequences": [],
+    "tree_stats": {
+      "total_states": 1,
+      "max_depth": 0,
+      "branching_factor": 0,
+      "sequence_count": 0
+    },
+    "processing_time": 4.291534423828125e-06,
+    "detection_issues": []
+  },
+  {
+    "attack": "WriteToAllCoils",
+    "event_types": 20,
+    "sequences": [],
+    "tree_stats": {
+      "total_states": 1,
+      "max_depth": 0,
+      "branching_factor": 0,
+      "sequence_count": 0
+    },
+    "processing_time": 4.291534423828125e-06,
+    "detection_issues": []
+  }
+]

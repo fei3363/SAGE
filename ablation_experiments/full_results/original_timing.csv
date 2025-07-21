@@ -1,0 +1,7 @@
+Attack,Time(s),Graphs,Alerts,Episodes
+Baselinereplay,14,0,0,0
+Falseinjection,5,0,0,0
+Modifylengthparameters,7,0,0,0
+Reconnaissance,4,0,0,0
+Stackmodbusframes,4,0,0,0
+WriteToAllCoils,5,0,0,0

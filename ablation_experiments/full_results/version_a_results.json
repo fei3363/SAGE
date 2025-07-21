@@ -1,0 +1,58 @@
+[
+  {
+    "attack": "Baselinereplay",
+    "raw_signatures": [],
+    "event_count": 0,
+    "unique_sequences": 0,
+    "estimated_states": 5,
+    "processing_time": 2.2172927856445312e-05
+  },
+  {
+    "attack": "Falseinjection",
+    "raw_signatures": [],
+    "event_count": 0,
+    "unique_sequences": 0,
+    "estimated_states": 5,
+    "processing_time": 2.0503997802734375e-05
+  },
+  {
+    "attack": "Modifylengthparameters",
+    "raw_signatures": [],
+    "event_count": 0,
+    "unique_sequences": 0,
+    "estimated_states": 5,
+    "processing_time": 1.5735626220703125e-05
+  },
+  {
+    "attack": "Queryflooding",
+    "raw_signatures": [],
+    "event_count": 0,
+    "unique_sequences": 0,
+    "estimated_states": 5,
+    "processing_time": 1.4781951904296875e-05
+  },
+  {
+    "attack": "Reconnaissance",
+    "raw_signatures": [],
+    "event_count": 0,
+    "unique_sequences": 0,
+    "estimated_states": 5,
+    "processing_time": 2.7894973754882812e-05
+  },
+  {
+    "attack": "Stackmodbusframes",
+    "raw_signatures": [],
+    "event_count": 0,
+    "unique_sequences": 0,
+    "estimated_states": 5,
+    "processing_time": 1.52587890625e-05
+  },
+  {
+    "attack": "WriteToAllCoils",
+    "raw_signatures": [],
+    "event_count": 0,
+    "unique_sequences": 0,
+    "estimated_states": 5,
+    "processing_time": 1.5020370483398438e-05
+  }
+]
