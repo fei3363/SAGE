@@ -41,6 +41,8 @@ class MicroAttackStage(Enum):
     DATA_DELIVERY = 110
     PHISHING = 111
 
+    IT_BRUTE_FORCE_CREDS = 120
+    IT_LATERAL_MOVEMENT = 121
     # ATT&CK for ICS techniques
     # Initial Access (初始存取)
     DRIVE_BY_COMPROMISE = 200

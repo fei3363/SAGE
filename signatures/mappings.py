@@ -50,6 +50,8 @@ micro = {
     109: "MicroAttackStage.DATA_EXFILTRATION",
     110: "MicroAttackStage.DATA_DELIVERY",
     111: "MicroAttackStage.PHISHING",
+    120: "MicroAttackStage.IT_BRUTE_FORCE_CREDS",
+    121: "MicroAttackStage.IT_LATERAL_MOVEMENT",
     # ATT&CK for ICS techniques
     200: "MicroAttackStage.DRIVE_BY_COMPROMISE",
     201: "MicroAttackStage.EXPLOIT_PUBLIC_FACING_APP_ICS",
@@ -173,6 +175,8 @@ micro2macro = {
     "MicroAttackStage.DATA_EXFILTRATION": "MacroAttackStage.DISCLOSURE",
     "MicroAttackStage.DATA_DELIVERY": "MacroAttackStage.DELIVERY",
     "MicroAttackStage.PHISHING": "MacroAttackStage.DELIVERY",
+    "MicroAttackStage.IT_BRUTE_FORCE_CREDS": "MacroAttackStage.PRIVLEDGE_ESC",
+    "MicroAttackStage.IT_LATERAL_MOVEMENT": "MacroAttackStage.ENSURE_ACCESS",
     
     # ATT&CK for ICS - Initial Access
     "MicroAttackStage.DRIVE_BY_COMPROMISE": "MacroAttackStage.DELIVERY",
@@ -363,6 +367,8 @@ small_mapping = {
     109: "exfil",
     110: "delivery",
     111: "phish",
+    120: "itBFCreds",
+    121: "itLateral",
     # ATT&CK for ICS techniques
     200: "driveByComp",
     201: "explPubApp",
@@ -487,6 +493,8 @@ verbose_micro = {
     "DATA_EXFILTRATION": "DATA EXFILTRATION",
     "DATA_DELIVERY": "DATA DELIVERY",
     "PHISHING": "PHISHING",
+    "IT_BRUTE_FORCE_CREDS": "IT BRUTE FORCE CREDENTIALS",
+    "IT_LATERAL_MOVEMENT": "IT LATERAL MOVEMENT",
     # ATT&CK for ICS techniques - Initial Access
     "DRIVE_BY_COMPROMISE": "DRIVE-BY COMPROMISE (T0817)",
     "EXPLOIT_PUBLIC_FACING_APP_ICS": "EXPLOIT PUBLIC-FACING APPLICATION (T0819)",

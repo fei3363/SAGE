@@ -210,10 +210,10 @@ def _create_edge_line(vid, vname1, vname2, ts1, ts2, color, attacker):
         label = '<<font color="{}"> start_next: {}<br/>gap: {}sec<br/>end_prev: {}</font>'
         label += '<br/><font color="{}"><b>Attacker: {}</b></font>>'
         label = label.format(color, to_first, gap, from_last, color, attacker)
-        edge_line = '{} [ color={}] [label={}]'.format(edge_name, color, label)
+        edge_line = '{} [color="{}", label={}]'.format(edge_name, color, label)
     else:
         label = 'start_next: {}\ngap: {}sec\nend_prev: {}'.format(to_first, gap, from_last)
-        edge_line = '{} [ label="{}"][ fontcolor="{}" color={}]'.format(edge_name, label, color, color)
+        edge_line = '{} [label="{}", fontcolor="{}", color="{}"]'.format(edge_name, label, color, color)
     return edge_line
 
 
@@ -303,7 +303,7 @@ def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=T
                 print('\t     No attack attempts found for this objective')
                 continue
 
-            ag_name = re.sub(r'[|_\-\(\)]', '', obj)
+            ag_name = re.sub(r'[|_\-\(\)/]', '', obj)
             lines = [
                 (0, f'digraph {ag_name} {{'),
                 (0, 'rankdir="BT"; '
@@ -314,16 +314,16 @@ def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=T
 
             root_node = _translate(obj, root=victim)
             lines += [
-                (0, f'"{root_node}" [shape=doubleoctagon, style=filled, fillcolor=salmon];'),
+                (0, f'"{root_node}" [shape=doubleoctagon, style=filled, fillcolor="salmon"];'),
                 (0, f'{{ rank = max; "{root_node}" }}')
             ]
 
             # --- objective variants 連到 root ---
             for var in observed_obj:
                 lines.append((0, f'"{_translate(var)}" -> "{root_node}"'))
-                style = ('[style="filled,dotted", fillcolor=salmon]'
+                style = ('[style="filled,dotted", fillcolor="salmon"]'
                          if _is_severe_sink(var, sev_sinks)
-                         else '[style=filled, fillcolor=salmon]')
+                         else '[style="filled", fillcolor="salmon"]')
                 lines.append((0, f'"{_translate(var)}" {style}'))
             lines.append((0, '{ rank=same; "' +
                           '" "'.join(_translate(v) for v in observed_obj) + '" }'))
@@ -347,7 +347,7 @@ def make_attack_graphs(state_sequences, sev_sinks, datafile, dir_name, save_ag=T
                         vname = action[0]
                         if idx == 0:   # 第一個行動
                             style = 'dotted,filled' if _is_severe_sink(vname, sev_sinks) else 'filled'
-                            lines.append((0, f'"{_translate(vname)}" [style="{style}", fillcolor=yellow]'))
+                            lines.append((0, f'"{_translate(vname)}" [style="{style}", fillcolor="yellow"]'))
                             if _is_severe_sink(vname, sev_sinks):
                                 already_addressed.add(vname.split('|')[2])
                         else:          # 其餘行動若為 Sink，可補 dotted

@@ -1007,6 +1007,13 @@ ics_micro_stages = {
 
 # Zeek mapping organized by ATT&CK for ICS tactics
 zeek_mapping = {
+
+
+    "IT_HTTP_Brute_Force": MicroAttackStage.IT_BRUTE_FORCE_CREDS,
+    "IT_Lateral_Movement_SSH": MicroAttackStage.IT_LATERAL_MOVEMENT,
+        
+
+
     # ========== Initial Access (初始存取) ==========
     # T0819 - Exploit Public-Facing Application
     "OT_HTTP_Suspicious_URI": MicroAttackStage.EXPLOIT_PUBLIC_FACING_APP_ICS,
@@ -1040,7 +1047,7 @@ zeek_mapping = {
     # ========== Collection (收集) ==========
     # T0893 - Data from Local System
     "Modbus READ_FILE_RECORD": MicroAttackStage.DATA_FROM_LOCAL_SYSTEM_ICS,
-    
+
     # ========== Inhibit Response Function (抑制響應功能) ==========
     # T0814 - Denial of Service
     "OT_Query_Flooding": MicroAttackStage.DENIAL_OF_SERVICE_ICS,
@@ -1050,7 +1057,7 @@ zeek_mapping = {
     # T0855 - Unauthorized Command Message
     "OT_Replay_Attack": MicroAttackStage.UNAUTHORIZED_COMMAND_MESSAGE,
     "OT_Baseline_Replay_Attack": MicroAttackStage.UNAUTHORIZED_COMMAND_MESSAGE,
-    
+    "OT_Modbus_Invalid_Function": MicroAttackStage.UNAUTHORIZED_COMMAND_MESSAGE,
     # T0836 - Modify Parameters
     "OT_Modbus_Write": MicroAttackStage.MODIFY_PARAMETERS,
     "Modbus WRITE_SINGLE_COIL": MicroAttackStage.MODIFY_PARAMETERS,
