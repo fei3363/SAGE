@@ -2,12 +2,12 @@ macro = {
     0: "MacroAttackStage.NONE",
     1: "MacroAttackStage.PASSIVE_RECON",
     2: "MacroAttackStage.ACTIVE_RECON",
-    3: "MacroAttackStage.PRIVLEDGE_ESC",
+    3: "MacroAttackStage.PRIVILEGE_ESC",
     4: "MacroAttackStage.ENSURE_ACCESS",
     5: "MacroAttackStage.TARGETED_EXP",
     6: "MacroAttackStage.ZERO_DAY",
     7: "MacroAttackStage.DISRUPT",
-    8: "MacroAttackStage.DISTROY",
+    8: "MacroAttackStage.DESTROY",
     9: "MacroAttackStage.DISTORT",
     10: "MacroAttackStage.DISCLOSURE",
     11: "MacroAttackStage.DELIVERY"
@@ -148,12 +148,12 @@ micro2macro = {
     "MicroAttackStage.SERVICE_DISC": "MacroAttackStage.ACTIVE_RECON",
     "MicroAttackStage.VULN_DISC": "MacroAttackStage.ACTIVE_RECON",
     "MicroAttackStage.INFO_DISC": "MacroAttackStage.ACTIVE_RECON",
-    "MicroAttackStage.PRIV_ESC": "MacroAttackStage.PRIVLEDGE_ESC",
-    "MicroAttackStage.USER_PRIV_ESC": "MacroAttackStage.PRIVLEDGE_ESC",
-    "MicroAttackStage.ROOT_PRIV_ESC": "MacroAttackStage.PRIVLEDGE_ESC",
-    "MicroAttackStage.NETWORK_SNIFFING": "MacroAttackStage.PRIVLEDGE_ESC",
-    "MicroAttackStage.BRUTE_FORCE_CREDS": "MacroAttackStage.PRIVLEDGE_ESC",
-    "MicroAttackStage.ACCT_MANIP": "MacroAttackStage.PRIVLEDGE_ESC",
+    "MicroAttackStage.PRIV_ESC": "MacroAttackStage.PRIVILEGE_ESC",
+    "MicroAttackStage.USER_PRIV_ESC": "MacroAttackStage.PRIVILEGE_ESC",
+    "MicroAttackStage.ROOT_PRIV_ESC": "MacroAttackStage.PRIVILEGE_ESC",
+    "MicroAttackStage.NETWORK_SNIFFING": "MacroAttackStage.PRIVILEGE_ESC",
+    "MicroAttackStage.BRUTE_FORCE_CREDS": "MacroAttackStage.PRIVILEGE_ESC",
+    "MicroAttackStage.ACCT_MANIP": "MacroAttackStage.PRIVILEGE_ESC",
     "MicroAttackStage.TRUSTED_ORG_EXP": "MacroAttackStage.TARGETED_EXP",
     "MicroAttackStage.PUBLIC_APP_EXP": "MacroAttackStage.TARGETED_EXP",
     "MicroAttackStage.REMOTE_SERVICE_EXP": "MacroAttackStage.TARGETED_EXP",
@@ -167,15 +167,15 @@ micro2macro = {
     "MicroAttackStage.NETWORK_DOS": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.SERVICE_STOP": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.RESOURCE_HIJACKING": "MacroAttackStage.DISRUPT",
-    "MicroAttackStage.DATA_DESTRUCTION": "MacroAttackStage.DISTROY",
-    "MicroAttackStage.CONTENT_WIPE": "MacroAttackStage.DISTROY",
+    "MicroAttackStage.DATA_DESTRUCTION": "MacroAttackStage.DESTROY",
+    "MicroAttackStage.CONTENT_WIPE": "MacroAttackStage.DESTROY",
     "MicroAttackStage.DATA_ENCRYPTION": "MacroAttackStage.DISTORT",
     "MicroAttackStage.DEFACEMENT": "MacroAttackStage.DISTORT",
     "MicroAttackStage.DATA_MANIPULATION": "MacroAttackStage.DISTORT",
     "MicroAttackStage.DATA_EXFILTRATION": "MacroAttackStage.DISCLOSURE",
     "MicroAttackStage.DATA_DELIVERY": "MacroAttackStage.DELIVERY",
     "MicroAttackStage.PHISHING": "MacroAttackStage.DELIVERY",
-    "MicroAttackStage.IT_BRUTE_FORCE_CREDS": "MacroAttackStage.PRIVLEDGE_ESC",
+    "MicroAttackStage.IT_BRUTE_FORCE_CREDS": "MacroAttackStage.PRIVILEGE_ESC",
     "MicroAttackStage.IT_LATERAL_MOVEMENT": "MacroAttackStage.ENSURE_ACCESS",
     
     # ATT&CK for ICS - Initial Access
@@ -213,7 +213,7 @@ micro2macro = {
     "MicroAttackStage.VALID_ACCOUNTS_ICS": "MacroAttackStage.ENSURE_ACCESS",
     
     # ATT&CK for ICS - Privilege Escalation
-    "MicroAttackStage.EXPLOITATION_FOR_PRIVILEGE_ESCALATION": "MacroAttackStage.PRIVLEDGE_ESC",
+    "MicroAttackStage.EXPLOITATION_FOR_PRIVILEGE_ESCALATION": "MacroAttackStage.PRIVILEGE_ESC",
     
     # ATT&CK for ICS - Evasion
     "MicroAttackStage.EXPLOITATION_FOR_EVASION": "MacroAttackStage.ENSURE_ACCESS",
@@ -231,7 +231,7 @@ micro2macro = {
     "MicroAttackStage.WIRELESS_SNIFFING": "MacroAttackStage.ACTIVE_RECON",
     
     # ATT&CK for ICS - Lateral Movement
-    "MicroAttackStage.DEFAULT_CREDENTIALS": "MacroAttackStage.PRIVLEDGE_ESC",
+    "MicroAttackStage.DEFAULT_CREDENTIALS": "MacroAttackStage.PRIVILEGE_ESC",
     "MicroAttackStage.LATERAL_TOOL_TRANSFER": "MacroAttackStage.ENSURE_ACCESS",
     "MicroAttackStage.PROGRAM_DOWNLOAD": "MacroAttackStage.TARGETED_EXP",
     
@@ -258,8 +258,8 @@ micro2macro = {
     "MicroAttackStage.BLOCK_COMMAND_MESSAGE": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.BLOCK_REPORTING_MESSAGE": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.BLOCK_SERIAL_COM": "MacroAttackStage.DISRUPT",
-    "MicroAttackStage.CHANGE_CREDENTIAL": "MacroAttackStage.PRIVLEDGE_ESC",
-    "MicroAttackStage.DATA_DESTRUCTION_ICS": "MacroAttackStage.DISTROY",
+    "MicroAttackStage.CHANGE_CREDENTIAL": "MacroAttackStage.PRIVILEGE_ESC",
+    "MicroAttackStage.DATA_DESTRUCTION_ICS": "MacroAttackStage.DESTROY",
     "MicroAttackStage.DENIAL_OF_SERVICE_ICS": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.DEVICE_RESTART_SHUTDOWN": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.MANIPULATE_IO_IMAGE": "MacroAttackStage.DISTORT",
@@ -272,14 +272,14 @@ micro2macro = {
     "MicroAttackStage.UNAUTHORIZED_COMMAND_MESSAGE": "MacroAttackStage.TARGETED_EXP",
     
     # ATT&CK for ICS - Impact
-    "MicroAttackStage.DAMAGE_TO_PROPERTY": "MacroAttackStage.DISTROY",
+    "MicroAttackStage.DAMAGE_TO_PROPERTY": "MacroAttackStage.DESTROY",
     "MicroAttackStage.DENIAL_OF_CONTROL": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.DENIAL_OF_VIEW": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.LOSS_OF_AVAILABILITY": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.LOSS_OF_CONTROL": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.LOSS_OF_PRODUCTIVITY_AND_REVENUE": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.LOSS_OF_PROTECTION": "MacroAttackStage.DISRUPT",
-    "MicroAttackStage.LOSS_OF_SAFETY": "MacroAttackStage.DISTROY",
+    "MicroAttackStage.LOSS_OF_SAFETY": "MacroAttackStage.DESTROY",
     "MicroAttackStage.LOSS_OF_VIEW": "MacroAttackStage.DISRUPT",
     "MicroAttackStage.MANIPULATION_OF_CONTROL": "MacroAttackStage.DISTORT",
     "MicroAttackStage.MANIPULATION_OF_VIEW": "MacroAttackStage.DISTORT",

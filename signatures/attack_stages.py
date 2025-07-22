@@ -169,12 +169,12 @@ class MacroAttackStage(Enum):
     NONE = 0
     PASSIVE_RECON = 1
     ACTIVE_RECON = 2
-    PRIVLEDGE_ESC = 3
+    PRIVILEGE_ESC = 3
     ENSURE_ACCESS = 4
     TARGETED_EXP = 5
     ZERO_DAY = 6
     DISRUPT = 7
-    DISTROY = 8
+    DESTROY = 8
     DISTORT = 9
     DISCLOSURE = 10
     DELIVERY = 11
