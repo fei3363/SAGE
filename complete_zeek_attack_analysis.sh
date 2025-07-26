@@ -25,7 +25,7 @@ if [ ! -d "$ATTACK_BASE_PATH" ]; then
 fi
 
 SAGE_PATH="$HOME/SAGE"
-ZEEK_CMD="/opt/zeek/bin/zeek -Cr 1.pcapng icsnpp-modbus ~/SAGE/zeek/ot_alert_filter_all_v1.0.zeek"
+ZEEK_CMD="/opt/zeek/bin/zeek -Cr 1.pcapng icsnpp-modbus ~/SAGE/zeek/ot_alert_filter_all_v1.0.1-scada.zeek"
 
 # 定義所有要處理的資料夾和對應的攻擊名稱
 declare -A folders_and_attacks=(

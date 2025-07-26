@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  sage:
+    build: .
+    image: sage:latest
+    container_name: sage-analyzer
+    volumes:
+      # 掛載 PCAP 檔案目錄
+      - ./data:/opt/sage/data
+      # 掛載輸出目錄
+      - ./output:/opt/sage/output
+      # 掛載配置檔案
+      - ./config.ini:/opt/sage/config.ini:ro
+    environment:
+      - SAGE_LOG_LEVEL=INFO
+      - SAGE_THREADS=4
+    networks:
+      - sage-network
+    # 若需要即時分析，取消下面的註解
+    # cap_add:
+    #   - NET_ADMIN
+    #   - NET_RAW
+    # network_mode: host
+
+  # 選擇性：Elasticsearch 用於儲存結果
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: sage-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - sage-network
+
+  # 選擇性：Kibana 用於視覺化
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.0
+    container_name: sage-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - sage-network
+    depends_on:
+      - elasticsearch
+
+  # 選擇性：Grafana 用於監控
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sage-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - "3000:3000"
+    networks:
+      - sage-network
+
+volumes:
+  esdata:
+    driver: local
+  grafana-storage:
+    driver: local
+
+networks:
+  sage-network:
+    driver: bridge
