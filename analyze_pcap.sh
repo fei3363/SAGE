@@ -101,7 +101,8 @@ count_packets() {
     local packet_count=0
     
     if command -v capinfos >/dev/null 2>&1; then
-        packet_count=$(capinfos -c "$pcap_file" 2>/dev/null | grep "Number of packets" | awk '{print $NF}')
+        # capinfos 可能輸出 "1172 k" 格式，需要合併數字和單位
+        packet_count=$(capinfos -c "$pcap_file" 2>/dev/null | grep "Number of packets" | awk '{if ($(NF-1) ~ /^[0-9]+$/) print $(NF-1) $NF; else print $NF}')
     elif command -v tcpdump >/dev/null 2>&1; then
         packet_count=$(tcpdump -r "$pcap_file" -nn 2>/dev/null | wc -l)
     else
